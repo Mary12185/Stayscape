@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayScape — Luxury Stays</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f7f7f7;color:#111;overflow-x:hidden;}
+.nav{height:80px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 60px;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#ff385c;}
+.nav-links{display:flex;align-items:center;gap:18px;}
+.nav-links a{text-decoration:none;color:#111;font-weight:600;font-size:.92rem;}
+.host-btn{background:#ff385c;color:#fff !important;padding:12px 18px;border-radius:14px;}
+.hero{max-width:1250px;margin:auto;padding:80px 30px;display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;}
+.hero-text h1{font-family:'Playfair Display',serif;font-size:4.5rem;line-height:1.1;margin-bottom:24px;}
+.hero-text p{font-size:1rem;line-height:1.9;color:#666;margin-bottom:32px;max-width:520px;}
+.hero-buttons{display:flex;gap:16px;flex-wrap:wrap;}
+.primary-btn{background:#ff385c;color:#fff;padding:16px 24px;border-radius:16px;text-decoration:none;font-weight:700;}
+.secondary-btn{background:#fff;color:#111;padding:16px 24px;border-radius:16px;text-decoration:none;font-weight:700;border:1px solid #ddd;}
+.hero img{width:100%;height:620px;object-fit:cover;border-radius:32px;box-shadow:0 15px 50px rgba(0,0,0,.12);}
+.features{max-width:1250px;margin:auto;padding:20px 30px 90px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.feature-card{background:#fff;padding:32px;border-radius:28px;box-shadow:0 10px 30px rgba(0,0,0,.05);}
+.feature-card h3{margin-bottom:14px;font-size:1.2rem;}
+.feature-card p{color:#666;line-height:1.8;font-size:.92rem;}
+.section{max-width:1250px;margin:auto;padding:0 30px 90px;}
+.section h2{font-family:'Playfair Display',serif;font-size:3rem;margin-bottom:40px;}
+.stays{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.stay-card{background:#fff;border-radius:28px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.05);}
+.stay-card img{width:100%;height:260px;object-fit:cover;}
+.stay-content{padding:24px;}
+.stay-content h3{margin-bottom:10px;font-size:1.2rem;}
+.location{color:#666;margin-bottom:14px;font-size:.9rem;}
+.price{font-weight:700;font-size:1rem;}
+.cta{background:#111;color:#fff;margin:0 30px 80px;border-radius:32px;padding:70px 40px;text-align:center;}
+.cta h2{font-family:'Playfair Display',serif;font-size:3rem;margin-bottom:20px;}
+.cta p{max-width:700px;margin:auto;line-height:1.9;color:#ccc;margin-bottom:30px;}
+.cta a{display:inline-block;background:#ff385c;color:#fff;padding:16px 28px;border-radius:16px;text-decoration:none;font-weight:700;}
+.footer{background:#fff;padding:35px;text-align:center;border-top:1px solid #eee;color:#666;font-size:.9rem;}
+@media(max-width:950px){
+  .hero,.features,.stays{grid-template-columns:1fr;}
+  .hero-text h1{font-size:3.2rem;}
+  .nav{padding:0 20px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">StayScape</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="listings.html">Explore</a>
+    <a href="login.html" id="loginLink">Login</a>
+    <a href="my-bookings.html" id="bookingLink" style="display:none;">Bookings</a>
+    <a href="#" id="logoutBtn" style="display:none;">Logout</a>
+    <a href="host-login.html" class="host-btn">Become a Host</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Luxury stays for your next unforgettable escape</h1>
+    <p>Discover villas, apartments, cabins, and unique stays around the world with StayScape. Book premium experiences with comfort, style, and security.</p>
+    <div class="hero-buttons">
+      <a href="listings.html" class="primary-btn">Explore Stays</a>
+      <a href="host-login.html" class="secondary-btn">Start Hosting</a>
+    </div>
+  </div>
+  <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80">
+</section>
+
+<section class="features">
+  <div class="feature-card"><h3>🌍 Worldwide Destinations</h3><p>Explore handpicked luxury properties across beaches, mountains, and cities worldwide.</p></div>
+  <div class="feature-card"><h3>🔒 Secure Booking</h3><p>Safe payments, verified hosts, and secure reservations with 24/7 support.</p></div>
+  <div class="feature-card"><h3>⭐ Premium Experiences</h3><p>Enjoy curated stays with modern amenities, comfort, and unforgettable views.</p></div>
+</section>
+
+<section class="section">
+  <h2>Popular stays</h2>
+  <div class="stays" id="staysGrid">
+    <!-- Loaded from database -->
+    <div class="stay-card"><img src="https://images.unsplash.com/photo-1494526585095-c41746248156?w=1200&q=80"><div class="stay-content"><h3>Modern Apartment</h3><p class="location">Dubai, UAE</p><p class="price">$260 / night</p></div></div>
+    <div class="stay-card"><img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80"><div class="stay-content"><h3>Luxury Beach Villa</h3><p class="location">Bali, Indonesia</p><p class="price">$420 / night</p></div></div>
+    <div class="stay-card"><img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?w=1200&q=80"><div class="stay-content"><h3>Mountain Cabin</h3><p class="location">Swiss Alps</p><p class="price">$310 / night</p></div></div>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>Become a StayScape Host</h2>
+  <p>Turn your extra space into income. Host travelers from around the world and grow your earnings securely with StayScape.</p>
+  <a href="host-login.html">Start Hosting</a>
+</section>
+
+<footer class="footer">© 2026 StayScape. All rights reserved.</footer>
+
+<script>
+const API = 'api.php';
+
+async function checkAuth() {
+  try {
+    const response = await fetch(API + '?action=me');
+    const data = await response.json();
+
+    const loginLink = document.getElementById('loginLink');
+    const bookingLink = document.getElementById('bookingLink');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (data.loggedIn === true) {
+      loginLink.style.display = 'none';
+      bookingLink.style.display = 'inline-block';
+      logoutBtn.style.display = 'inline-block';
+    } else {
+      loginLink.style.display = 'inline-block';
+      bookingLink.style.display = 'none';
+      logoutBtn.style.display = 'none';
+    }
+
+  } catch (error) {
+    console.log('Authentication check failed');
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async function (e) {
+  e.preventDefault();
+  try {
+    await fetch(API + '?action=logout', { method: 'POST' });
+    window.location.reload();
+  } catch (error) {
+    console.log('Logout failed');
+  }
+});
+
+async function loadProperties() {
+  try {
+    const response = await fetch(API + '?action=get_properties');
+    const data = await response.json();
+
+    if (!data.success || data.properties.length === 0) return;
+
+    const grid = document.getElementById('staysGrid');
+
+    grid.innerHTML = data.properties.slice(0, 3).map(property => `
+      <div class="stay-card" onclick="window.location.href='property-detail.html?id=${property.id}'" style="cursor:pointer;">
+        <img src="${property.image_url || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80'}">
+        <div class="stay-content">
+          <h3>${property.title}</h3>
+          <p class="location">${property.location}</p>
+          <p class="price">$${parseFloat(property.price_night).toFixed(0)} / night</p>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (error) {
+    console.log('Failed to load properties');
+  }
+}
+
+checkAuth();
+loadProperties();
+</script>
+</body>
+</html>

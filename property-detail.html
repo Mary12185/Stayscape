@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>StayScape — Property Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#FF385C;--rose-d:#D93B5C;--rose-s:rgba(255,56,92,.1);
+  --bg:#fff;--bg2:#F8F6F3;--bg3:#EFEBE5;
+  --text:#1C1C1C;--text2:#6B6B6B;--text3:#BBBBBB;
+  --border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.15);
+  --card:#fff;--input-bg:#F8F6F3;
+  --shadow-s:0 2px 12px rgba(0,0,0,.07);
+  --shadow-m:0 8px 32px rgba(0,0,0,.11);
+  --shadow-l:0 20px 60px rgba(0,0,0,.14);
+}
+[data-theme=dark]{
+  --bg:#111;--bg2:#191919;--bg3:#242424;
+  --text:#F0F0F0;--text2:#909090;--text3:#444;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --card:#1E1E1E;--input-bg:#242424;
+  --shadow-s:0 2px 12px rgba(0,0,0,.4);
+  --shadow-m:0 8px 32px rgba(0,0,0,.5);
+  --shadow-l:0 20px 60px rgba(0,0,0,.65);
+}
+html,body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit;outline:none;border:none;background:none}
+img{display:block;width:100%;object-fit:cover}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:9px}
+
+/* ── NAV ─────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+.nav-inner{max-width:1240px;margin:0 auto;height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);display:flex;align-items:center;gap:6px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.n-lnk{padding:8px 14px;border-radius:99px;font-size:.82rem;font-weight:600;border:1.5px solid var(--border2);color:var(--text);transition:all .2s;}
+.n-lnk:hover{border-color:var(--rose);color:var(--rose)}
+.n-solid{background:var(--rose);color:#fff;border-color:var(--rose);}
+.n-solid:hover{background:var(--rose-d)}
+.theme-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .2s;}
+.theme-btn:hover{background:var(--bg2)}
+
+/* ── BREADCRUMB ──────────────────────────── */
+.breadcrumb{max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text2);}
+.breadcrumb a{color:var(--text2);transition:color .15s;}
+.breadcrumb a:hover{color:var(--rose)}
+.breadcrumb span{color:var(--text3)}
+
+/* ── HERO TITLE ROW ──────────────────────── */
+.title-row{max-width:1240px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.prop-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;line-height:1.15;flex:1;}
+.title-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.act-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;border:1.5px solid var(--border2);font-size:.8rem;font-weight:600;color:var(--text);transition:all .2s;}
+.act-btn:hover{border-color:var(--rose);color:var(--rose)}
+.act-btn.fav-on{background:var(--rose);border-color:var(--rose);color:#fff;}
+
+/* ── META ROW ────────────────────────────── */
+.meta-row{max-width:1240px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;font-size:.85rem;color:var(--text2);}
+.meta-chip{display:flex;align-items:center;gap:5px;}
+.meta-chip strong{color:var(--text);}
+.meta-sep{width:4px;height:4px;border-radius:50%;background:var(--text3);}
+.badge-gs{background:var(--rose);color:#fff;font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:99px;}
+
+/* ── PHOTO GRID ──────────────────────────── */
+.photo-grid{max-width:1240px;margin:0 auto;padding:0 24px 32px;display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:10px;border-radius:0;}
+.photo-grid .ph{border-radius:12px;overflow:hidden;cursor:pointer;position:relative;}
+.photo-grid .ph img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.photo-grid .ph:hover img{transform:scale(1.04)}
+.photo-grid .ph:first-child{grid-row:1/3;border-radius:16px;}
+.photo-grid .ph:last-child{position:relative;}
+.show-all-btn{position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,.95);color:var(--text);padding:8px 14px;border-radius:10px;font-size:.78rem;font-weight:700;box-shadow:var(--shadow-s);transition:all .2s;backdrop-filter:blur(6px);}
+.show-all-btn:hover{background:#fff;box-shadow:var(--shadow-m)}
+
+/* ── MAIN LAYOUT ─────────────────────────── */
+.main-wrap{max-width:1240px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start;}
+
+/* ── LEFT CONTENT ────────────────────────── */
+/* Host row */
+.host-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.host-info{}
+.host-info h2{font-size:1.1rem;font-weight:700;margin-bottom:4px;}
+.host-info p{font-size:.83rem;color:var(--text2);}
+.host-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#ff8c69);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:700;flex-shrink:0;position:relative;}
+.host-av-badge{position:absolute;bottom:0;right:0;width:18px;height:18px;border-radius:50%;background:var(--rose);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;}
+
+/* Quick stats */
+.quick-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-bottom:24px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.qs{background:var(--bg2);border-radius:14px;padding:16px;text-align:center;}
+.qs-icon{font-size:1.4rem;margin-bottom:6px;}
+.qs-val{font-size:1.05rem;font-weight:700;margin-bottom:2px;}
+.qs-lbl{font-size:.7rem;color:var(--text2);}
+
+/* Description */
+.sec-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:12px;}
+.desc-text{font-size:.9rem;color:var(--text2);line-height:1.75;margin-bottom:8px;}
+.read-more{font-size:.83rem;font-weight:700;color:var(--rose);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:4px;}
+.read-more:hover{text-decoration:underline}
+
+/* Section divider */
+.s-div{border:none;border-top:1px solid var(--border);margin:24px 0;}
+
+/* Amenities */
+.amenity-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.amenity{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border-radius:12px;font-size:.84rem;font-weight:500;}
+.amenity-icon{font-size:1.1rem;flex-shrink:0;}
+.amenity.disabled{opacity:.4;text-decoration:line-through;}
+.show-more-btn{font-size:.83rem;font-weight:700;padding:11px 20px;border-radius:10px;border:1.5px solid var(--border2);color:var(--text);transition:all .2s;margin-top:6px;}
+.show-more-btn:hover{border-color:var(--rose);color:var(--rose)}
+
+/* Calendar */
+.calendar-wrap{background:var(--bg2);border-radius:16px;padding:20px;margin-top:12px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-title{font-size:.95rem;font-weight:700;}
+.cal-nav{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;}
+.cal-nav:hover{border-color:var(--rose);color:var(--rose)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-lbl{text-align:center;font-size:.67rem;font-weight:700;color:var(--text3);padding-bottom:6px;}
+.cal-day{text-align:center;padding:8px 4px;border-radius:8px;font-size:.8rem;cursor:pointer;transition:all .15s;position:relative;}
+.cal-day:hover:not(.disabled):not(.booked){background:var(--rose-s);color:var(--rose)}
+.cal-day.selected{background:var(--rose);color:#fff;font-weight:700;}
+.cal-day.in-range{background:var(--rose-s);color:var(--rose);}
+.cal-day.booked{color:var(--text3);cursor:not-allowed;text-decoration:line-through;}
+.cal-day.disabled{color:var(--text3);cursor:not-allowed;opacity:.4;}
+.cal-day.today{font-weight:700;border:1.5px solid var(--rose);}
+
+/* Reviews */
+.reviews-summary{display:flex;align-items:center;gap:24px;background:var(--bg2);border-radius:16px;padding:20px;margin-bottom:20px;}
+.big-rating{text-align:center;}
+.big-rat-num{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;line-height:1;color:var(--rose);}
+.big-rat-stars{font-size:1rem;color:var(--rose);letter-spacing:2px;margin:4px 0;}
+.big-rat-count{font-size:.75rem;color:var(--text2);}
+.rat-bars{flex:1;}
+.rat-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.rat-bar-lbl{font-size:.75rem;color:var(--text2);width:80px;flex-shrink:0;}
+.rat-bar-track{flex:1;height:4px;background:var(--bg3);border-radius:99px;overflow:hidden;}
+.rat-bar-fill{height:100%;background:var(--rose);border-radius:99px;}
+.rat-bar-val{font-size:.72rem;font-weight:600;width:28px;text-align:right;flex-shrink:0;}
+
+.review-list{display:flex;flex-direction:column;gap:20px;}
+.rev-card{padding-bottom:20px;border-bottom:1px solid var(--border);}
+.rev-card:last-child{border-bottom:none;}
+.rev-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.rev-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;}
+.rev-name{font-size:.88rem;font-weight:700;}
+.rev-date{font-size:.73rem;color:var(--text2);}
+.rev-stars{color:var(--rose);font-size:.8rem;letter-spacing:1px;}
+.rev-text{font-size:.86rem;color:var(--text2);line-height:1.7;}
+
+/* Map placeholder */
+.map-box{background:var(--bg2);border-radius:16px;height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;font-size:.9rem;color:var(--text3);border:1px solid var(--border);overflow:hidden;position:relative;}
+.map-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;}
+.map-box-overlay{position:relative;z-index:1;text-align:center;}
+
+/* ── BOOKING CARD (RIGHT) ────────────────── */
+.booking-card{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:24px;box-shadow:var(--shadow-m);position:sticky;top:84px;}
+.bc-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:20px;}
+.bc-price{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;}
+.bc-per{font-size:.88rem;color:var(--text2);}
+.bc-rating{display:flex;align-items:center;gap:4px;font-size:.82rem;font-weight:600;margin-left:auto;}
+.bc-star{color:var(--rose);}
+.bc-rev{color:var(--text2);font-weight:400;}
+
+.bc-dates{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:10px;}
+.bc-date-field{padding:12px 14px;cursor:pointer;transition:background .15s;}
+.bc-date-field:first-child{border-right:1px solid var(--border2);}
+.bc-date-field:hover{background:var(--bg2)}
+.bc-date-lbl{font-size:.63rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text);margin-bottom:3px;}
+.bc-date-val{font-size:.85rem;color:var(--text2);}
+.bc-date-val input{font-size:.85rem;color:var(--text2);width:100%;cursor:pointer;}
+
+.bc-guests-field{border:1.5px solid var(--border2);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s;}
+.bc-guests-field:hover{background:var(--bg2)}
+.bc-guests-lbl{font-size:.63rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text);margin-bottom:3px;}
+.bc-guests-val{font-size:.85rem;color:var(--text2);}
+.guest-counter{display:flex;align-items:center;gap:10px;}
+.gc-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:600;transition:all .2s;}
+.gc-btn:hover{border-color:var(--rose);color:var(--rose)}
+.gc-num{font-size:.9rem;font-weight:700;min-width:20px;text-align:center;}
+
+.book-btn{width:100%;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--rose-d));color:#fff;font-size:1rem;font-weight:700;letter-spacing:.2px;transition:all .2s;box-shadow:0 4px 20px rgba(255,56,92,.32);margin-bottom:14px;}
+.book-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,56,92,.42);}
+
+.bc-breakdown{display:flex;flex-direction:column;gap:10px;padding-top:14px;border-top:1px solid var(--border);}
+.bc-line{display:flex;align-items:center;justify-content:space-between;font-size:.85rem;color:var(--text2);}
+.bc-line span:last-child{color:var(--text);font-weight:500;}
+.bc-total{display:flex;align-items:center;justify-content:space-between;font-size:.95rem;font-weight:700;padding-top:12px;border-top:1px solid var(--border);}
+.bc-no-charge{text-align:center;font-size:.75rem;color:var(--text3);margin-top:10px;}
+
+.bc-host-row{display:flex;align-items:center;gap:10px;padding:14px;background:var(--bg2);border-radius:12px;margin-top:16px;cursor:pointer;transition:background .2s;}
+.bc-host-row:hover{background:var(--bg3)}
+.bc-host-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#ff8c69);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;flex-shrink:0;}
+.bc-host-info{flex:1;}
+.bc-host-name{font-size:.82rem;font-weight:700;}
+.bc-host-resp{font-size:.72rem;color:var(--text2);}
+.bc-host-arrow{color:var(--text3);}
+.msg-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--border2);font-size:.85rem;font-weight:600;color:var(--text);transition:all .2s;margin-top:8px;}
+.msg-btn:hover{border-color:var(--rose);color:var(--rose)}
+
+/* ── TOAST ───────────────────────────────── */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:var(--bg);padding:12px 22px;border-radius:12px;font-size:.82rem;font-weight:600;box-shadow:var(--shadow-l);z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--rose);}
+
+/* LOGIN GATE */
+.login-gate-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.login-gate-overlay.show{opacity:1;pointer-events:all;}
+.login-gate-modal{background:var(--card);border-radius:24px;padding:40px 36px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow-l);transform:translateY(20px);transition:transform .3s;}
+.login-gate-overlay.show .login-gate-modal{transform:translateY(0);}
+.login-gate-icon{font-size:2.8rem;margin-bottom:16px;}
+.login-gate-title{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:10px;color:var(--text);}
+.login-gate-sub{font-size:.88rem;color:var(--text2);line-height:1.7;margin-bottom:24px;}
+.login-gate-actions{display:flex;gap:12px;margin-bottom:14px;}
+.lga-primary{flex:1;padding:13px;background:var(--rose);color:#fff;border-radius:12px;font-weight:700;font-size:.92rem;text-decoration:none;transition:background .2s;}
+.lga-primary:hover{background:var(--rose-d)}
+.lga-secondary{flex:1;padding:13px;background:var(--bg2);color:var(--text);border-radius:12px;font-weight:700;font-size:.92rem;text-decoration:none;border:1.5px solid var(--border2);transition:all .2s;}
+.lga-secondary:hover{border-color:var(--rose);color:var(--rose)}
+.lga-close{font-size:.82rem;color:var(--text2);font-weight:600;cursor:pointer;background:none;border:none;padding:6px;transition:color .2s;}
+.lga-close:hover{color:var(--rose)}
+
+/* ── MOBILE BOOK BAR ─────────────────────── */
+.mob-book-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--bg);border-top:1px solid var(--border);padding:14px 20px;gap:12px;align-items:center;}
+.mob-price{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;}
+.mob-price span{font-size:.78rem;font-weight:400;color:var(--text2);}
+.mob-book-btn{flex:1;padding:13px;border-radius:12px;background:var(--rose);color:#fff;font-weight:700;font-size:.88rem;transition:background .2s;}
+.mob-book-btn:hover{background:var(--rose-d)}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media(max-width:1024px){
+  .main-wrap{grid-template-columns:1fr}
+  .booking-card{display:none}
+  .mob-book-bar{display:flex}
+  body{padding-bottom:80px}
+}
+@media(max-width:768px){
+  .photo-grid{grid-template-columns:1fr 1fr;grid-template-rows:200px 160px}
+  .photo-grid .ph:first-child{grid-row:auto;grid-column:1/3}
+  .photo-grid .ph:nth-child(4),.photo-grid .ph:nth-child(5){display:none}
+  .quick-stats{grid-template-columns:1fr 1fr}
+  .amenity-grid{grid-template-columns:1fr}
+  .reviews-summary{flex-direction:column;gap:16px}
+}
+@media(max-width:480px){
+  .photo-grid{grid-template-columns:1fr;grid-template-rows:260px 180px 180px}
+  .photo-grid .ph:first-child{grid-column:1}
+  .photo-grid .ph:nth-child(3),.photo-grid .ph:nth-child(4),.photo-grid .ph:nth-child(5){display:none}
+  .n-lnk:not(.n-solid){display:none}
+  .title-row{flex-direction:column;gap:10px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo" id="logoBtn" style="cursor:pointer;"><span class="logo-dot"></span>StayScape</div>
+    <div class="nav-right">
+      <button class="theme-btn" id="themeBtn">🌙</button>
+      <a href="login.html" class="n-lnk" id="loginBtn">Log in</a>
+      <a href="login.html" class="n-lnk n-solid" id="signupBtn">Sign up</a>
+    </div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">Home</a>
+  <span>/</span>
+  <a href="listings.html">Stays</a>
+  <span>/</span>
+  <a href="listings.html">Properties</a>
+  <span>/</span>
+  <span style="color:var(--text)" id="breadcrumbLocation">Loading...</span>
+</div>
+
+<!-- TITLE ROW -->
+<div class="title-row">
+  <h1 class="prop-title" id="propTitle">Loading property...</h1>
+  <div class="title-actions">
+    <button class="act-btn" onclick="shareProperty()">↗ Share</button>
+  </div>
+</div>
+
+<!-- META ROW -->
+<div class="meta-row" id="metaRow">
+  <div class="meta-chip">Loading...</div>
+</div>
+
+<!-- PHOTO GRID -->
+<div class="photo-grid">
+  <div class="ph"><img id="mainImg" src="https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=900&q=85" alt="Property main"/></div>
+  <div class="ph"><img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&q=80" alt="Pool"/></div>
+  <div class="ph"><img src="https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&q=80" alt="Bedroom"/></div>
+  <div class="ph"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80" alt="Bathroom"/></div>
+  <div class="ph" style="position:relative">
+    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80" alt="Living room"/>
+    <button class="show-all-btn" onclick="showToast('📸 Gallery opened!',true)">⊞ Show all photos</button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-wrap">
+
+  <!-- LEFT CONTENT -->
+  <div>
+    <!-- Host Row -->
+    <div class="host-row" id="hostRow">
+      <div class="host-info">
+        <h2 id="hostTitle">Loading...</h2>
+        <p id="hostDetails">Loading...</p>
+      </div>
+      <div class="host-av" id="hostAvatar">
+        ?
+        <div class="host-av-badge">⭐</div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="qs"><div class="qs-icon">🏅</div><div class="qs-val">Top 5%</div><div class="qs-lbl">of all listings</div></div>
+      <div class="qs"><div class="qs-icon">💬</div><div class="qs-val">100%</div><div class="qs-lbl">response rate</div></div>
+      <div class="qs"><div class="qs-icon">⚡</div><div class="qs-val">&lt;1 hour</div><div class="qs-lbl">response time</div></div>
+    </div>
+
+    <!-- Description -->
+    <div class="sec-title">About this place</div>
+    <p class="desc-text" id="descText">Loading...</p>
+    <p class="desc-text" id="extraDesc" style="display:none"></p>
+    <button class="read-more" onclick="toggleDesc()" id="readMoreBtn">Show more ↓</button>
+
+    <hr class="s-div"/>
+
+    <!-- Amenities -->
+    <div class="sec-title">What this place offers</div>
+    <div class="amenity-grid" id="amenityGrid">
+      <div class="amenity"><span class="amenity-icon">🌊</span>Caldera & sea view</div>
+      <div class="amenity"><span class="amenity-icon">🏊</span>Private infinity pool</div>
+      <div class="amenity"><span class="amenity-icon">📶</span>High-speed WiFi</div>
+      <div class="amenity"><span class="amenity-icon">❄️</span>Air conditioning</div>
+      <div class="amenity"><span class="amenity-icon">🍳</span>Full kitchen</div>
+      <div class="amenity"><span class="amenity-icon">🅿️</span>Free parking</div>
+    </div>
+    <button class="show-more-btn" id="amenBtn" onclick="toggleAmenities()">Show all amenities</button>
+
+    <hr class="s-div"/>
+
+    <!-- Availability Calendar -->
+    <div class="sec-title">Select check-in date</div>
+    <div class="calendar-wrap">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="prevMonth()">←</button>
+        <div class="cal-title" id="calTitle">May 2026</div>
+        <button class="cal-nav" onclick="nextMonth()">→</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <hr class="s-div"/>
+
+    <!-- Reviews -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="sec-title" style="margin-bottom:0">★ <span id="reviewRating">4.97</span> · <span id="reviewCount">284</span> reviews</div>
+      <button class="show-more-btn" style="padding:8px 14px;font-size:.76rem">See all reviews</button>
+    </div>
+    <div class="reviews-summary">
+      <div class="big-rating">
+        <div class="big-rat-num" id="bigRating">4.97</div>
+        <div class="big-rat-stars">★★★★★</div>
+        <div class="big-rat-count" id="bigRatingCount">284 reviews</div>
+      </div>
+      <div class="rat-bars">
+        <div class="rat-bar-row"><span class="rat-bar-lbl">Cleanliness</span><div class="rat-bar-track"><div class="rat-bar-fill" style="width:99%"></div></div><span class="rat-bar-val">5.0</span></div>
+        <div class="rat-bar-row"><span class="rat-bar-lbl">Communication</span><div class="rat-bar-track"><div class="rat-bar-fill" style="width:98%"></div></div><span class="rat-bar-val">4.9</span></div>
+        <div class="rat-bar-row"><span class="rat-bar-lbl">Check-in</span><div class="rat-bar-track"><div class="rat-bar-fill" style="width:99%"></div></div><span class="rat-bar-val">5.0</span></div>
+        <div class="rat-bar-row"><span class="rat-bar-lbl">Accuracy</span><div class="rat-bar-track"><div class="rat-bar-fill" style="width:96%"></div></div><span class="rat-bar-val">4.8</span></div>
+        <div class="rat-bar-row"><span class="rat-bar-lbl">Location</span><div class="rat-bar-track"><div class="rat-bar-fill" style="width:100%"></div></div><span class="rat-bar-val">5.0</span></div>
+        <div class="rat-bar-row"><span class="rat-bar-lbl">Value</span><div class="rat-bar-track"><div class="rat-bar-fill" style="width:94%"></div></div><span class="rat-bar-val">4.7</span></div>
+      </div>
+    </div>
+
+    <div class="review-list">
+      <div class="rev-card">
+        <div class="rev-top">
+          <div class="rev-av" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe)">S</div>
+          <div>
+            <div class="rev-name">Sara K.</div>
+            <div class="rev-date">April 2026</div>
+          </div>
+          <div class="rev-stars" style="margin-left:auto">★★★★★</div>
+        </div>
+        <p class="rev-text">"Absolutely breathtaking! The infinity pool overlooking the caldera is everything the photos promised and more. Elena was an exceptional host — she left us a welcome basket and was always available. We will definitely be back!"</p>
+      </div>
+      <div class="rev-card">
+        <div class="rev-top">
+          <div class="rev-av" style="background:linear-gradient(135deg,#00b894,#55efc4)">J</div>
+          <div>
+            <div class="rev-name">James & Lily T.</div>
+            <div class="rev-date">March 2026</div>
+          </div>
+          <div class="rev-stars" style="margin-left:auto">★★★★★</div>
+        </div>
+        <p class="rev-text">"Our honeymoon could not have been more perfect. Waking up to the sunrise over the caldera every morning was a dream. The villa is immaculate, stylish, and incredibly well equipped. A truly special place."</p>
+      </div>
+      <div class="rev-card">
+        <div class="rev-top">
+          <div class="rev-av" style="background:linear-gradient(135deg,#e17055,#fab1a0)">A</div>
+          <div>
+            <div class="rev-name">Ahmed R.</div>
+            <div class="rev-date">February 2026</div>
+          </div>
+          <div class="rev-stars" style="margin-left:auto">★★★★☆</div>
+        </div>
+        <p class="rev-text">"Stunning location, great amenities, and the pool is absolutely incredible. Docked one star only because the wifi was a little slow — but honestly it made us disconnect and enjoy the view more!"</p>
+      </div>
+    </div>
+
+    <hr class="s-div"/>
+
+    <!-- Location -->
+    <div class="sec-title">Where you'll be</div>
+    <p class="desc-text" id="locationText" style="margin-bottom:14px">Loading...</p>
+    <div class="map-box">
+      <img src="https://images.unsplash.com/photo-1601581975053-7c199dbc4925?w=900&q=70" alt="Map area"/>
+      <div class="map-box-overlay">
+        <div style="font-size:2rem;margin-bottom:6px">📍</div>
+        <div style="font-size:.82rem;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)" id="mapLocation">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: BOOKING CARD -->
+  <div>
+    <div class="booking-card">
+      <div class="bc-price-row">
+        <div class="bc-price" id="bcPrice">$420</div>
+        <div class="bc-per">/ night</div>
+        <div class="bc-rating">
+          <span class="bc-star">★</span> <span id="bcRating">4.97</span>
+          <span class="bc-rev">(<span id="bcReviewCount">284</span>)</span>
+        </div>
+      </div>
+
+      <div class="bc-dates">
+        <div class="bc-date-field">
+          <div class="bc-date-lbl">Check in</div>
+          <div class="bc-date-val"><input type="date" id="bc-in" value="2026-06-10"/></div>
+        </div>
+        <div class="bc-date-field">
+          <div class="bc-date-lbl">Check out</div>
+          <div class="bc-date-val"><input type="date" id="bc-out" value="2026-06-15"/></div>
+        </div>
+      </div>
+
+      <div class="bc-guests-field">
+        <div>
+          <div class="bc-date-lbl">Guests</div>
+          <div class="bc-guests-val" id="guestLabel">2 guests</div>
+        </div>
+        <div class="guest-counter">
+          <button class="gc-btn" onclick="changeGuests(-1)">−</button>
+          <span class="gc-num" id="guestCount">2</span>
+          <button class="gc-btn" onclick="changeGuests(1)">+</button>
+        </div>
+      </div>
+
+      <button class="book-btn" onclick="handleBook()">Reserve</button>
+
+      <div style="text-align:center;font-size:.75rem;color:var(--text3);margin-bottom:14px;">You won't be charged yet</div>
+
+      <div class="bc-breakdown">
+        <div class="bc-line"><span>$<span id="nightlyPrice">420</span> × <span id="numNights">5</span> nights</span><span id="bc-sub">$2,100</span></div>
+        <div class="bc-line"><span>Cleaning fee</span><span>$120</span></div>
+        <div class="bc-line"><span>StayScape service fee</span><span>$189</span></div>
+      </div>
+      <div class="bc-total"><span>Total</span><span id="bc-total">$2,409</span></div>
+      <div class="bc-no-charge">Price includes all taxes</div>
+
+      <div class="bc-host-row" id="contactHostBtn" onclick="showToast('💬 Message sent to host!',true)">
+        <div class="bc-host-av" id="contactHostAvatar">E</div>
+        <div class="bc-host-info">
+          <div class="bc-host-name" id="contactHostName">Contact Host</div>
+          <div class="bc-host-resp">Usually responds within an hour</div>
+        </div>
+        <span class="bc-host-arrow">→</span>
+      </div>
+      <button class="msg-btn" onclick="showToast('💬 Message sent!',true)">✉️ Send a message</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOOK BAR -->
+<div class="mob-book-bar">
+  <div>
+    <div class="mob-price" id="mobPrice">$420 <span>/ night</span></div>
+    <div style="font-size:.72rem;color:var(--rose);" id="mobRating">★ 4.97 · 284 reviews</div>
+  </div>
+  <button class="mob-book-btn" onclick="handleBook()">Reserve</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN GATE MODAL -->
+<div class="login-gate-overlay" id="loginGateOverlay">
+  <div class="login-gate-modal">
+    <div class="login-gate-icon">🔐</div>
+    <h2 class="login-gate-title">Login Required</h2>
+    <p class="login-gate-sub"> Please login to your account before Booking.</p>
+    <div class="login-gate-actions">
+      <a href="login.html" class="lga-primary">Login</a>
+      <a href="sign-up.html" class="lga-secondary">Sign Up</a>
+    </div>
+    <button class="lga-close" onclick="document.getElementById('loginGateOverlay').classList.remove('show')">&#10005; Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ============================================
+   ALL PROPERTIES DATA - FIXED
+============================================ */
+const allProperties = [
+  {id:1,title:'Cliffside Villa with Infinity Pool',loc:'Santorini, Greece',cat:'villa',price:420,rating:4.97,reviews:284,beds:3,baths:2,guests:6,img:'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=900&q=85',badge:'Guest Fav',bt:'g',amenities:['wifi','pool','ac','kitchen'],type:'villa',host:'Elena',superhost:true,description:'Perched dramatically on the edge of Santorini\'s caldera, this stunning three-bedroom villa offers unparalleled panoramic views of the Aegean Sea and the iconic Oia sunset. The infinity pool seems to merge seamlessly with the horizon, creating a truly magical atmosphere at every hour of the day.',description2:'The villa is designed in traditional Cycladic style — white-washed walls, arched doorways, and handcrafted stone floors — yet fitted with every modern luxury. A fully equipped gourmet kitchen, indoor-outdoor living areas, and a private terrace with sun loungers make this the perfect base for an unforgettable Aegean retreat. Elena, your dedicated host, lives locally and is always on hand to provide insider recommendations.',location:'Oia, Santorini, South Aegean, Greece'},
+  {id:2,title:'Sleek City Loft, Barcelona',loc:'Barcelona, Spain',cat:'apartment',price:185,rating:4.89,reviews:412,beds:1,baths:1,guests:2,img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&q=85',badge:'New',bt:'n',amenities:['wifi','ac','kitchen'],type:'apartment',host:'Marc',superhost:false,description:'Modern loft in the heart of Barcelona\'s Gothic Quarter. This stylish apartment features exposed brick walls, high ceilings, and contemporary finishes.',description2:'Located just steps away from Las Ramblas and Barcelona Cathedral, you\'ll have easy access to the best restaurants, shops, and cultural attractions. The apartment includes a fully equipped kitchen, comfortable living area, and a workspace perfect for digital nomads.',location:'Gothic Quarter, Barcelona, Spain'},
+  {id:3,title:'Cozy Log Cabin by the Lake',loc:'Vermont, USA',cat:'cabin',price:230,rating:4.95,reviews:196,beds:2,baths:1,guests:4,img:'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=900&q=85',badge:null,bt:'',amenities:['wifi','parking','kitchen','pet'],type:'cabin',host:'John',superhost:true,description:'Rustic log cabin nestled in the Vermont woods, just 50 feet from a pristine lake. Perfect for nature lovers seeking peace and quiet.',description2:'Enjoy swimming, fishing, and kayaking right from your backyard. The cabin features a stone fireplace, full kitchen, and a large deck overlooking the lake. Winter activities include skiing at nearby resorts and ice skating on the lake.',location:'Lake Champlain, Vermont, USA'},
+  {id:4,title:'Private Beachfront Bungalow',loc:'Koh Samui, Thailand',cat:'beach',price:310,rating:4.92,reviews:338,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=900&q=85',badge:'Top Rated',bt:'t',amenities:['wifi','pool','ac','waterfront'],type:'beachfront',host:'Somchai',superhost:true,description:'Beachfront bungalow with direct access to a private white sand beach. Wake up to the sound of waves and enjoy breathtaking sunsets from your porch.',description2:'The bungalow features traditional Thai decor with modern amenities. A private infinity pool overlooks the ocean, and the outdoor shower lets you rinse off after swimming. Daily housekeeping and breakfast included.',location:'Lamai Beach, Koh Samui, Thailand'},
+  {id:5,title:'Alpine Chalet Ski-in Ski-out',loc:'Zermatt, Switzerland',cat:'mountain',price:680,rating:4.98,reviews:97,beds:4,baths:3,guests:8,img:'https://images.unsplash.com/photo-1455156218388-5e61b526818b?w=900&q=85',badge:null,bt:'',amenities:['wifi','parking','ac','kitchen','pool'],type:'mountain',host:'Hans',superhost:true,description:'Luxury alpine chalet with ski-in/ski-out access to the Matterhorn slopes. Floor-to-ceiling windows showcase stunning mountain views.',description2:'The chalet features a private sauna, hot tub, and fireplace. After a day on the slopes, relax in the heated pool or enjoy a glass of wine on the balcony overlooking Zermatt village. Ski storage and boot warmers included.',location:'Zermatt, Valais, Switzerland'},
+  {id:6,title:'Penthouse Suite Harbour Views',loc:'Sydney, Australia',cat:'luxury',price:890,rating:5.0,reviews:52,beds:3,baths:3,guests:6,img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=85',badge:'Luxury',bt:'g',amenities:['wifi','pool','ac','kitchen'],type:'luxury',host:'Emma',superhost:true,description:'Spectacular penthouse with 360-degree views of Sydney Harbour and the Opera House. Modern design meets ultimate luxury.',description2:'The penthouse spans the entire top floor with floor-to-ceiling windows in every room. Features include a private rooftop terrace, infinity pool, home theater, and gourmet kitchen with Italian marble countertops. Concierge service available 24/7.',location:'Darling Harbour, Sydney, Australia'},
+  {id:7,title:'Tropical Garden Pool Villa',loc:'Ubud, Bali',cat:'villa',price:270,rating:4.93,reviews:221,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=900&q=85',badge:null,bt:'',amenities:['wifi','pool','ac','kitchen','parking'],type:'villa',host:'Ketut',superhost:true,description:'Private villa surrounded by lush tropical gardens and rice terraces. Your own plunge pool and outdoor pavilion create a serene retreat.',description2:'Located just minutes from Ubud\'s cultural center, this villa offers the perfect balance of tranquility and convenience. Daily breakfast prepared by your private chef, and yoga classes available upon request.',location:'Ubud, Bali, Indonesia'},
+  {id:8,title:'Historic Brownstone Apartment',loc:'Brooklyn, New York',cat:'apartment',price:155,rating:4.85,reviews:389,beds:2,baths:1,guests:4,img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&q=85',badge:null,bt:'',amenities:['wifi','ac','kitchen'],type:'apartment',host:'Sarah',superhost:false,description:'Charming pre-war brownstone apartment in historic Brooklyn Heights. Original details blend with modern comforts.',description2:'Just a 5-minute walk to the Brooklyn Bridge Park and Promenade with stunning Manhattan views. The apartment features high ceilings, hardwood floors, and a private backyard garden.',location:'Brooklyn Heights, New York, USA'},
+  {id:9,title:'Oceanfront Glass House',loc:'Malibu, California',cat:'luxury',price:1200,rating:4.99,reviews:43,beds:4,baths:4,guests:8,img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=900&q=85',badge:'Premium',bt:'g',amenities:['wifi','pool','ac','kitchen','waterfront','parking'],type:'luxury',host:'David',superhost:true,description:'Architectural masterpiece with floor-to-ceiling glass walls offering panoramic ocean views. Direct beach access from your backyard.',description2:'The glass house features an open-concept design, private infinity pool, hot tub, and outdoor kitchen. Watch dolphins and whales from your living room, or enjoy spectacular sunsets over the Pacific Ocean.',location:'Malibu, California, USA'},
+  {id:10,title:'Mountain View Treehouse',loc:'Asheville, NC',cat:'tiny',price:195,rating:4.91,reviews:167,beds:1,baths:1,guests:2,img:'https://images.unsplash.com/photo-1520984032042-162d526883f9?w=900&q=85',badge:'Unique',bt:'n',amenities:['wifi','ac','kitchen','pet'],type:'tiny',host:'Lisa',superhost:true,description:'Unique treehouse nestled among ancient oaks with breathtaking Blue Ridge Mountain views. Perfect romantic getaway.',description2:'The treehouse features a spiral staircase, cozy loft bedroom, outdoor shower, and a wraparound deck. Fall asleep to the sounds of nature and wake up to birds singing. Located 15 minutes from downtown Asheville.',location:'Asheville, North Carolina, USA'},
+  {id:11,title:'Tuscany Farmhouse Retreat',loc:'Florence, Italy',cat:'farm',price:340,rating:4.96,reviews:118,beds:3,baths:2,guests:6,img:'https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=900&q=85',badge:null,bt:'',amenities:['wifi','parking','kitchen','pet'],type:'farm',host:'Giovanni',superhost:true,description:'Restored 18th-century farmhouse surrounded by olive groves and vineyards. Experience authentic Tuscan country living.',description2:'The property includes a private garden, swimming pool, and outdoor pizza oven. Cooking classes available featuring local ingredients. Just 20 minutes from Florence\'s historic center.',location:'Tuscany, Florence, Italy'},
+  {id:12,title:'Rooftop Apartment with City View',loc:'Dubai, UAE',cat:'city',price:420,rating:4.88,reviews:203,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=900&q=85',badge:null,bt:'',amenities:['wifi','pool','ac','kitchen'],type:'apartment',host:'Ahmed',superhost:false,description:'Luxurious apartment on the 50th floor with stunning views of the Burj Khalifa and Dubai skyline.',description2:'Located in Downtown Dubai, this apartment offers access to a rooftop infinity pool, state-of-the-art gym, and concierge service. Minutes away from Dubai Mall and fountains.',location:'Downtown Dubai, UAE'}
+];
+
+// Get property ID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const propertyId = parseInt(urlParams.get('id')) || 1;
+
+// Find current property
+let currentProperty = allProperties.find(p => p.id === propertyId);
+if (!currentProperty) {
+    currentProperty = allProperties[0];
+}
+
+// Store for booking
+window.currentPropertyId = currentProperty.id;
+window.currentPropertyPrice = currentProperty.price;
+
+/* ============================================
+   UPDATE PAGE WITH PROPERTY DATA
+============================================ */
+function updatePageContent() {
+    document.title = `${currentProperty.title} — StayScape`;
+    document.getElementById('propTitle').textContent = currentProperty.title;
+    document.getElementById('breadcrumbLocation').textContent = currentProperty.loc;
+    document.getElementById('mainImg').src = currentProperty.img;
+    
+    // Meta row
+    const metaRow = document.getElementById('metaRow');
+    metaRow.innerHTML = `
+        <div class="meta-chip"><span class="pc-star" style="color:var(--rose)">★</span><strong>${currentProperty.rating}</strong><span>(${currentProperty.reviews} reviews)</span></div>
+        <div class="meta-sep"></div>
+        ${currentProperty.badge ? `<div class="meta-chip"><span class="badge-gs">${currentProperty.badge}</span></div><div class="meta-sep"></div>` : ''}
+        <div class="meta-chip">📍 ${currentProperty.loc}</div>
+        ${currentProperty.superhost ? `<div class="meta-sep"></div><div class="meta-chip">✅ Superhost</div>` : ''}
+    `;
+    
+    // Host row
+    document.getElementById('hostTitle').textContent = `Entire ${currentProperty.type} hosted by ${currentProperty.host}`;
+    document.getElementById('hostDetails').textContent = `${currentProperty.beds} beds · ${currentProperty.guests} guests · ${currentProperty.baths} bathrooms`;
+    document.getElementById('hostAvatar').innerHTML = `${currentProperty.host.charAt(0)}<div class="host-av-badge">⭐</div>`;
+    document.getElementById('contactHostName').textContent = `Contact ${currentProperty.host}`;
+    document.getElementById('contactHostAvatar').textContent = currentProperty.host.charAt(0);
+    
+    // Description
+    document.getElementById('descText').textContent = currentProperty.description;
+    document.getElementById('extraDesc').textContent = currentProperty.description2;
+    
+    // Location
+    document.getElementById('locationText').textContent = currentProperty.location;
+    document.getElementById('mapLocation').textContent = currentProperty.location.split(',')[0];
+    
+    // Reviews
+    document.getElementById('reviewRating').textContent = currentProperty.rating;
+    document.getElementById('reviewCount').textContent = currentProperty.reviews;
+    document.getElementById('bigRating').textContent = currentProperty.rating;
+    document.getElementById('bigRatingCount').textContent = `${currentProperty.reviews} reviews`;
+    
+    // Booking card
+    document.getElementById('bcPrice').textContent = `$${currentProperty.price}`;
+    document.getElementById('bcRating').textContent = currentProperty.rating;
+    document.getElementById('bcReviewCount').textContent = currentProperty.reviews;
+    document.getElementById('nightlyPrice').textContent = currentProperty.price;
+    document.getElementById('mobPrice').innerHTML = `$${currentProperty.price} <span>/ night</span>`;
+    document.getElementById('mobRating').innerHTML = `★ ${currentProperty.rating} · ${currentProperty.reviews} reviews`;
+}
+
+/* ============================================
+   API CONFIGURATION
+============================================ */
+const API = 'api.php';
+
+/* THEME */
+const root=document.documentElement;
+const saved=localStorage.getItem('sn-theme')||'light';
+root.setAttribute('data-theme',saved);
+const tb=document.getElementById('themeBtn');
+tb.textContent=saved==='dark'?'☀️':'🌙';
+tb.addEventListener('click',()=>{
+  const n=root.getAttribute('data-theme')==='light'?'dark':'light';
+  root.setAttribute('data-theme',n);localStorage.setItem('sn-theme',n);
+  tb.textContent=n==='dark'?'☀️':'🌙';
+});
+
+/* TOAST */
+function showToast(msg,ok=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(ok?' ok':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* SHARE */
+function shareProperty(){
+  if(navigator.share){navigator.share({title:currentProperty.title,url:window.location.href});}
+  else{navigator.clipboard.writeText(window.location.href);showToast('🔗 Link copied!',true);}
+}
+
+/* READ MORE */
+let descOpen=false;
+function toggleDesc(){
+  descOpen=!descOpen;
+  document.getElementById('extraDesc').style.display=descOpen?'block':'none';
+  document.getElementById('readMoreBtn').textContent=descOpen?'Show less ↑':'Show more ↓';
+}
+
+/* AMENITIES */
+let amenOpen=false;
+function toggleAmenities(){
+  amenOpen=!amenOpen;
+  const allAmenities = [
+    '<div class="amenity"><span class="amenity-icon">🌊</span>Ocean view</div>',
+    '<div class="amenity"><span class="amenity-icon">🏊</span>Private pool</div>',
+    '<div class="amenity"><span class="amenity-icon">📶</span>High-speed WiFi</div>',
+    '<div class="amenity"><span class="amenity-icon">❄️</span>Air conditioning</div>',
+    '<div class="amenity"><span class="amenity-icon">🍳</span>Full kitchen</div>',
+    '<div class="amenity"><span class="amenity-icon">🅿️</span>Free parking</div>',
+    '<div class="amenity"><span class="amenity-icon">🧺</span>Washing machine</div>',
+    '<div class="amenity"><span class="amenity-icon">📺</span>Smart TV</div>'
+  ];
+  if(amenOpen){
+    document.getElementById('amenityGrid').innerHTML = allAmenities.join('');
+    document.getElementById('amenBtn').textContent = 'Show fewer amenities';
+  } else {
+    document.getElementById('amenityGrid').innerHTML = allAmenities.slice(0,6).join('');
+    document.getElementById('amenBtn').textContent = 'Show all amenities';
+  }
+}
+
+/* GUESTS */
+let guests=2;
+function changeGuests(d){
+  guests=Math.max(1,Math.min(currentProperty.guests,guests+d));
+  document.getElementById('guestCount').textContent=guests;
+  document.getElementById('guestLabel').textContent=guests+' guest'+(guests>1?'s':'');
+  calcTotal();
+}
+
+/* TOTAL CALC */
+function calcTotal(){
+  const inD=new Date(document.getElementById('bc-in').value);
+  const outD=new Date(document.getElementById('bc-out').value);
+  const nights=Math.max(1,Math.round((outD-inD)/(1000*60*60*24)));
+  const sub=currentProperty.price*nights;
+  document.getElementById('numNights').textContent=nights;
+  document.getElementById('bc-sub').textContent=`$${sub}`;
+  document.getElementById('bc-total').textContent=`$${sub+120+189}`;
+}
+document.getElementById('bc-in').addEventListener('change',calcTotal);
+document.getElementById('bc-out').addEventListener('change',calcTotal);
+
+/* ============================================
+   BOOK FUNCTION - FIXED
+============================================ */
+async function handleBook() {
+  try {
+    const response = await fetch(API + '?action=me', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+    
+    if (!data.loggedIn) {
+      document.getElementById('loginGateOverlay').classList.add('show');
+      return;
+    }
+  } catch(e) {
+    document.getElementById('loginGateOverlay').classList.add('show');
+    return;
+  }
+  
+  const inD = document.getElementById('bc-in').value;
+  const outD = document.getElementById('bc-out').value;
+  const guestsCount = guests;
+  
+  if (!inD || !outD) {
+    showToast('⚠️ Please select dates');
+    return;
+  }
+  
+  window.location.href = `booking.html?id=${currentProperty.id}&checkin=${inD}&checkout=${outD}&guests=${guestsCount}`;
+}
+
+/* ============================================
+   CALENDAR
+============================================ */
+let calYear=2026,calMonth=4;
+const bookedDays=[3,4,5,12,13,14,20,21,22];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+let selStart=null,selEnd=null;
+
+function renderCal(){
+  document.getElementById('calTitle').textContent=`${months[calMonth]} ${calYear}`;
+  const grid=document.getElementById('calGrid');
+  const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const today=new Date();
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+
+  let html=days.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++)html+=`<div class="cal-day disabled"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isPast=new Date(calYear,calMonth,d)<today&&!(calYear===today.getFullYear()&&calMonth===today.getMonth()&&d===today.getDate());
+    const isBooked=bookedDays.includes(d);
+    const isToday=calYear===today.getFullYear()&&calMonth===today.getMonth()&&d===today.getDate();
+    const isSel=d===selStart||d===selEnd;
+    const inRange=selStart&&selEnd&&d>selStart&&d<selEnd;
+    let cls='cal-day';
+    if(isPast||isBooked)cls+=' '+(isBooked?'booked':'disabled');
+    else if(isSel)cls+=' selected';
+    else if(inRange)cls+=' in-range';
+    if(isToday)cls+=' today';
+    html+=`<div class="${cls}" onclick="selectDay(${d},${isPast||isBooked})">${d}</div>`;
+  }
+  grid.innerHTML=html;
+}
+function selectDay(d,disabled){
+  if(disabled)return;
+  if(!selStart||selEnd){selStart=d;selEnd=null;}
+  else if(d<selStart){selStart=d;selEnd=null;}
+  else{selEnd=d;
+    const y=calYear,m=String(calMonth+1).padStart(2,'0');
+    document.getElementById('bc-in').value=`${y}-${m}-${String(selStart).padStart(2,'0')}`;
+    document.getElementById('bc-out').value=`${y}-${m}-${String(selEnd).padStart(2,'0')}`;
+    calcTotal();
+  }
+  renderCal();
+}
+
+function prevMonth(){if(calMonth===0){calMonth=11;calYear--;}else calMonth--;renderCal();}
+function nextMonth(){if(calMonth===11){calMonth=0;calYear++;}else calMonth++;renderCal();}
+
+/* ============================================
+   LOGO CLICK
+============================================ */
+document.getElementById('logoBtn').addEventListener('click', async function() {
+  try {
+    const res = await fetch(API + '?action=me');
+    const data = await res.json();
+    if (data.loggedIn) {
+      window.location.href = 'guest-dashboard.html';
+    } else {
+      window.location.href = 'index.html';
+    }
+  } catch(e) {
+    window.location.href = 'index.html';
+  }
+});
+
+/* ============================================
+   CHECK AUTH STATUS
+============================================ */
+async function checkAuthStatus() {
+  try {
+    const res = await fetch(API + '?action=me', {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.loggedIn) {
+      const loginBtn = document.getElementById('loginBtn');
+      const signupBtn = document.getElementById('signupBtn');
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (signupBtn) signupBtn.style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+// Initialize page
+updatePageContent();
+renderCal();
+calcTotal();
+checkAuthStatus();
+</script>
+</body>
+</html>

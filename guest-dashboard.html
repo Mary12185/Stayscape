@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>StayScape — Guest Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* (Keep your existing styles exactly as before - no changes needed) */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--rose:#FF385C;--rose-d:#D93B5C;--rose-s:rgba(255,56,92,.1);--bg:#fff;--bg2:#F8F6F3;--bg3:#EFEBE5;--text:#1C1C1C;--text2:#6B6B6B;--text3:#BBBBBB;--border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.15);--card:#fff;--input-bg:#F8F6F3;--shadow-s:0 2px 12px rgba(0,0,0,.07);--shadow-m:0 8px 32px rgba(0,0,0,.11);--shadow-l:0 20px 60px rgba(0,0,0,.14);--green:#00b894;--green-s:rgba(0,184,148,.1);--orange:#e17055;--blue:#0984e3;}
+[data-theme=dark]{--bg:#111;--bg2:#191919;--bg3:#242424;--text:#F0F0F0;--text2:#909090;--text3:#444;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);--card:#1E1E1E;--input-bg:#242424;--shadow-s:0 2px 12px rgba(0,0,0,.4);--shadow-m:0 8px 32px rgba(0,0,0,.5);--shadow-l:0 20px 60px rgba(0,0,0,.65);}
+html,body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg2);color:var(--text);transition:background .3s,color .3s;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit;outline:none;}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:9px}
+.nav{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;backdrop-filter:blur(16px);}
+.nav-inner{max-width:1280px;margin:0 auto;height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);display:flex;align-items:center;gap:6px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.theme-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .2s;}
+.theme-btn:hover{background:var(--bg2)}
+.host-link{background:transparent;border:1.5px solid var(--border2);padding:8px 16px;border-radius:99px;font-size:.8rem;font-weight:600;color:var(--text);transition:all .2s;}
+.host-link:hover{border-color:var(--rose);color:var(--rose)}
+.nav-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#ff8c69);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .2s;}
+.nav-av:hover{transform:scale(1.08)}
+.dash-wrap{max-width:1280px;margin:0 auto;padding:28px 24px;display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start;}
+.sidebar{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:sticky;top:88px;}
+.sb-profile{padding:24px;text-align:center;border-bottom:1px solid var(--border);background:linear-gradient(160deg,var(--rose-s),transparent);}
+.sb-av{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#ff8c69);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;font-weight:700;margin:0 auto 10px;border:3px solid var(--bg);}
+.sb-name{font-size:1rem;font-weight:700;margin-bottom:2px;}
+.sb-email{font-size:.74rem;color:var(--text2);}
+.sb-badge{display:inline-flex;align-items:center;gap:4px;background:var(--green-s);color:var(--green);font-size:.66rem;font-weight:700;padding:3px 10px;border-radius:99px;margin-top:8px;}
+.sb-nav{padding:10px 0;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:.85rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;border-left:3px solid transparent;}
+.sb-item:hover{background:var(--bg2);color:var(--text);}
+.sb-item.active{background:var(--rose-s);color:var(--rose);border-color:var(--rose);}
+.sb-item-ico{font-size:1.05rem;width:22px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:8px 16px;}
+.sb-logout{padding:14px 20px;}
+.logout-btn{width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--border2);font-size:.82rem;font-weight:600;color:var(--text2);transition:all .2s;}
+.logout-btn:hover{border-color:var(--rose);color:var(--rose)}
+.main{}
+.welcome-banner{background:linear-gradient(135deg,var(--rose),#ff6b6b);border-radius:20px;padding:24px 28px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;overflow:hidden;position:relative;}
+.wb-bg{position:absolute;right:-20px;top:-20px;font-size:8rem;opacity:.1;pointer-events:none;}
+.wb-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:4px;}
+.wb-sub{font-size:.83rem;opacity:.85;margin-bottom:14px;}
+.wb-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:99px;font-size:.82rem;font-weight:700;color:#fff;transition:all .2s;}
+.wb-btn:hover{background:rgba(255,255,255,.3)}
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;transition:transform .25s,box-shadow .25s;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-m)}
+.stat-icon{font-size:1.4rem;margin-bottom:8px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:.72rem;color:var(--text2);}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;}
+.sec-link{font-size:.8rem;font-weight:700;color:var(--rose);cursor:pointer;}
+.sec-link:hover{text-decoration:underline}
+.tab-bar{display:flex;gap:.4rem;margin-bottom:16px;background:var(--bg2);border-radius:12px;padding:4px;width:fit-content;}
+.tab-btn{padding:8px 16px;border-radius:9px;font-size:.8rem;font-weight:600;color:var(--text2);transition:all .2s;cursor:pointer;}
+.tab-btn.active{background:var(--card);color:var(--text);box-shadow:var(--shadow-s);}
+.booking-list{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.bk-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;transition:box-shadow .2s;}
+.bk-card:hover{box-shadow:var(--shadow-m)}
+.bk-img{width:120px;flex-shrink:0;overflow:hidden;}
+.bk-img img{width:100%;height:100%;object-fit:cover;}
+.bk-body{flex:1;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.bk-info{flex:1;}
+.bk-status{display:inline-flex;align-items:center;gap:5px;font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:99px;margin-bottom:6px;}
+.bk-status.upcoming{background:var(--green-s);color:var(--green);}
+.bk-status.completed{background:var(--bg2);color:var(--text2);}
+.bk-status.cancelled{background:rgba(225,112,85,.12);color:var(--orange);}
+.bk-status.pending{background:rgba(9,132,227,.1);color:var(--blue);}
+.bk-title{font-size:.92rem;font-weight:700;margin-bottom:4px;line-height:1.3;}
+.bk-loc{font-size:.76rem;color:var(--text2);margin-bottom:6px;}
+.bk-dates{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.bk-date-item{display:flex;align-items:center;gap:4px;font-size:.76rem;color:var(--text2);}
+.bk-price{font-size:.95rem;font-weight:700;text-align:right;flex-shrink:0;}
+.bk-price span{display:block;font-size:.7rem;font-weight:400;color:var(--text2);}
+.bk-actions{display:flex;flex-direction:column;gap:6px;justify-content:center;padding-right:14px;flex-shrink:0;}
+.bk-btn{padding:7px 14px;border-radius:10px;font-size:.76rem;font-weight:700;border:1.5px solid var(--border2);color:var(--text);transition:all .2s;white-space:nowrap;}
+.bk-btn:hover{border-color:var(--rose);color:var(--rose)}
+.bk-btn.primary{background:var(--rose);border-color:var(--rose);color:#fff;}
+.bk-btn.primary:hover{background:var(--rose-d)}
+.bk-btn.danger{color:var(--orange);border-color:var(--orange);}
+.bk-btn.danger:hover{background:var(--orange);color:#fff;}
+.profile-form{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.pf-field{display:flex;flex-direction:column;gap:5px;}
+.pf-field label{font-size:.7rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text2);}
+.pf-field input,.pf-field select,.pf-field textarea{padding:11px 13px;border:1.5px solid var(--border2);border-radius:11px;font-size:.85rem;color:var(--text);background:var(--input-bg);transition:border-color .2s;}
+.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--rose);outline:none;}
+.pf-field textarea{resize:vertical;min-height:80px;}
+.pf-save{padding:11px 24px;border-radius:12px;background:var(--rose);color:#fff;font-size:.85rem;font-weight:700;transition:background .2s;}
+.pf-save:hover{background:var(--rose-d)}
+.pf-message{margin-top:12px;padding:8px;border-radius:8px;font-size:.78rem;display:none;}
+.pf-message.success{background:var(--green-s);color:var(--green);display:block;}
+.pf-message.error{background:rgba(225,112,85,.12);color:var(--orange);display:block;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:var(--bg);padding:12px 22px;border-radius:12px;font-size:.82rem;font-weight:600;box-shadow:var(--shadow-l);z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--rose);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--card);border-radius:20px;padding:28px;max-width:380px;width:90%;text-align:center;}
+.modal-icon{font-size:3rem;margin-bottom:12px;}
+.modal-title{font-size:1.3rem;font-weight:700;margin-bottom:8px;}
+.modal-text{color:var(--text2);font-size:.85rem;margin-bottom:20px;}
+.modal-buttons{display:flex;gap:12px;}
+.modal-btn{flex:1;padding:12px;border-radius:12px;font-weight:700;font-size:.88rem;}
+.modal-btn.confirm{background:var(--rose);color:#fff;}
+.modal-btn.confirm:hover{background:var(--rose-d);}
+.modal-btn.cancel{background:var(--bg2);border:1.5px solid var(--border2);color:var(--text);}
+.modal-btn.cancel:hover{border-color:var(--rose);color:var(--rose);}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--bg);border-top:1px solid var(--border);padding:8px 0 12px;}
+.mob-nav-inner{display:flex;align-items:center;justify-content:space-around;}
+.mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;font-size:.6rem;font-weight:600;color:var(--text2);cursor:pointer;transition:color .2s;}
+.mob-nav-item.active{color:var(--rose);}
+.mob-nav-item span:first-child{font-size:1.2rem;}
+.empty-state{text-align:center;padding:40px;color:var(--text3);}
+.empty-state .icon{font-size:3rem;margin-bottom:12px;}
+.loading-spinner{text-align:center;padding:40px;color:var(--text2);}
+@media(max-width:1024px){.dash-wrap{grid-template-columns:1fr}.sidebar{display:none}.mob-nav{display:block}body{padding-bottom:80px}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.bk-card{flex-direction:column}.bk-img{width:100%;height:160px}.bk-actions{flex-direction:row;padding:0 14px 14px}.stats-row{grid-template-columns:1fr}.pf-row{grid-template-columns:1fr}.welcome-banner{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo"><span class="logo-dot"></span>StayScape</a>
+    <div class="nav-right">
+      <button class="theme-btn" id="themeBtn">🌙</button>
+      <a href="host-login.html" class="host-link">🏠 Become a Host</a>
+      <div class="nav-av" id="navAvatar">A</div>
+    </div>
+  </div>
+</nav>
+
+<div class="dash-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-profile">
+      <div class="sb-av" id="profileAvatar">A</div>
+      <div class="sb-name" id="profileName">Loading...</div>
+      <div class="sb-email" id="profileEmail">loading@email.com</div>
+      <div class="sb-badge">✅ Verified Guest</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-item active" onclick="showSection('overview')"><span class="sb-item-ico">🏠</span>Overview</div>
+      <div class="sb-item" onclick="showSection('bookings')"><span class="sb-item-ico">📅</span>My Bookings</div>
+      <div class="sb-divider"></div>
+      <div class="sb-item" onclick="showSection('profile')"><span class="sb-item-ico">👤</span>Edit Profile</div>
+    </div>
+    <div class="sb-logout">
+      <button class="logout-btn" onclick="showLogoutModal()">← Log Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ── OVERVIEW ── -->
+    <div id="sec-overview">
+      <div class="welcome-banner">
+        <div class="wb-bg">🌍</div>
+        <div>
+          <div class="wb-title" id="welcomeName">Welcome back! 👋</div>
+          <div class="wb-sub" id="welcomeMsg">Ready for your next adventure?</div>
+          <a href="listings.html" class="wb-btn">🔍 Explore new stays</a>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">✈️</div>
+          <div class="stat-val" id="statTrips">0</div>
+          <div class="stat-lbl">Total Trips</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-val" id="statReviews">0</div>
+          <div class="stat-lbl">Reviews Written</div>
+        </div>
+      </div>
+
+      <div class="sec-hd"><div class="sec-title">Upcoming Stay</div><span class="sec-link" onclick="showSection('bookings')">See all →</span></div>
+      <div class="booking-list" id="upcomingBooking">
+        <div class="loading-spinner">Loading upcoming bookings...</div>
+      </div>
+    </div>
+
+    <!-- ── BOOKINGS ── -->
+    <div id="sec-bookings" style="display:none">
+      <div class="sec-hd"><div class="sec-title">My Bookings</div></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="filterBookings('all',this)">All</button>
+        <button class="tab-btn" onclick="filterBookings('upcoming',this)">Upcoming</button>
+        <button class="tab-btn" onclick="filterBookings('completed',this)">Completed</button>
+        <button class="tab-btn" onclick="filterBookings('cancelled',this)">Cancelled</button>
+      </div>
+      <div class="booking-list" id="bookingList"></div>
+    </div>
+
+    <!-- ── PROFILE ── -->
+    <div id="sec-profile" style="display:none">
+      <div class="sec-hd"><div class="sec-title">Edit Profile</div></div>
+      <div class="profile-form">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);">
+          <div class="sb-av" style="width:72px;height:72px;font-size:1.8rem;" id="editAvatar">A</div>
+          <div><button style="padding:8px 16px;border-radius:10px;border:1.5px solid var(--border2);font-size:.8rem;font-weight:600;" onclick="showToast('📸 Photo upload coming soon')">Change photo</button></div>
+        </div>
+        <div class="pf-row">
+          <div class="pf-field"><label>Full Name</label><input type="text" id="editFullName"/></div>
+          <div class="pf-field"><label>Email</label><input type="email" id="editEmail"/></div>
+        </div>
+        <div class="pf-row">
+          <div class="pf-field"><label>Phone Number</label><input type="tel" id="editPhone" placeholder="+92 300 1234567"/></div>
+          <div class="pf-field"><label>Location</label><input type="text" id="editLocation" placeholder="City, Country"/></div>
+        </div>
+        <div class="pf-field" style="margin-bottom:16px;"><label>Bio</label><textarea id="editBio" placeholder="Tell us about yourself..."></textarea></div>
+        <button class="pf-save" onclick="saveProfile()">Save changes</button>
+        <div class="pf-message" id="profileMessage"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mob-nav">
+  <div class="mob-nav-inner">
+    <div class="mob-nav-item active" onclick="showSection('overview');setMobActive(this)"><span>🏠</span>Home</div>
+    <div class="mob-nav-item" onclick="showSection('bookings');setMobActive(this)"><span>📅</span>Bookings</div>
+    <div class="mob-nav-item" onclick="showSection('profile');setMobActive(this)"><span>👤</span>Profile</div>
+  </div>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal">
+    <div class="modal-icon">🚪</div>
+    <div class="modal-title">Log Out?</div>
+    <div class="modal-text">Are you sure you want to log out of your account?</div>
+    <div class="modal-buttons">
+      <button class="modal-btn confirm" onclick="confirmLogout()">Yes, Log Out</button>
+      <button class="modal-btn cancel" onclick="closeLogoutModal()">No, Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<script>
+const API = 'api.php';
+let currentUser = null;
+let allBookings = [];
+
+/* ============================================
+   AUTH CHECK & LOAD USER
+============================================ */
+async function checkAuth() {
+  try {
+    const res = await fetch(API + '?action=me');
+    const data = await res.json();
+    
+    if (!data.loggedIn) {
+      window.location.href = 'login.html';
+      return false;
+    }
+    
+    currentUser = data.user;
+    
+    // User ka naam properly set karo
+    const userName = currentUser.name || currentUser.full_name || 'Guest';
+    const userEmail = currentUser.email || '';
+    const initial = userName.charAt(0).toUpperCase();
+    
+    // Sab jagah naam aur initial update karo
+    document.getElementById('navAvatar').textContent = initial;
+    document.getElementById('profileAvatar').textContent = initial;
+    document.getElementById('editAvatar').textContent = initial;
+    document.getElementById('profileName').textContent = userName;
+    document.getElementById('profileEmail').textContent = userEmail;
+    document.getElementById('welcomeName').innerHTML = `Welcome back, ${userName.split(' ')[0]}! 👋`;
+    
+    // Profile form mein naam set karo
+    document.getElementById('editFullName').value = userName;
+    document.getElementById('editEmail').value = userEmail;
+    
+    await loadUserProfile();
+    await loadStats();
+    await loadBookings();
+    return true;
+  } catch (e) {
+    console.error('Auth check failed:', e);
+    window.location.href = 'login.html';
+    return false;
+  }
+}
+
+async function loadUserProfile() {
+  try {
+    const res = await fetch(API + '?action=get_user_profile');
+    const data = await res.json();
+    if (data.success && data.profile) {
+      const p = data.profile;
+      if (p.full_name) document.getElementById('editFullName').value = p.full_name;
+      if (p.email) document.getElementById('editEmail').value = p.email;
+      if (p.phone) document.getElementById('editPhone').value = p.phone;
+      if (p.location) document.getElementById('editLocation').value = p.location;
+      if (p.bio) document.getElementById('editBio').value = p.bio;
+    }
+  } catch(e) {
+    console.error('Load profile error:', e);
+  }
+}
+
+async function saveProfile() {
+  const fullName = document.getElementById('editFullName').value.trim();
+  const email = document.getElementById('editEmail').value.trim();
+  const phone = document.getElementById('editPhone').value.trim();
+  const location = document.getElementById('editLocation').value.trim();
+  const bio = document.getElementById('editBio').value.trim();
+  
+  const msgDiv = document.getElementById('profileMessage');
+  msgDiv.className = 'pf-message';
+  msgDiv.style.display = 'none';
+  
+  try {
+    const res = await fetch(API + '?action=update_user_profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name: fullName, email, phone, location, bio })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      currentUser.name = fullName;
+      const initial = fullName.charAt(0).toUpperCase();
+      document.getElementById('navAvatar').textContent = initial;
+      document.getElementById('profileAvatar').textContent = initial;
+      document.getElementById('editAvatar').textContent = initial;
+      document.getElementById('profileName').textContent = fullName;
+      document.getElementById('welcomeName').innerHTML = `Welcome back, ${fullName.split(' ')[0]}! 👋`;
+      
+      msgDiv.textContent = '✅ Profile updated successfully!';
+      msgDiv.classList.add('success');
+      msgDiv.style.display = 'block';
+      setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+      showToast('Profile updated!', true);
+    } else {
+      msgDiv.textContent = '❌ ' + (data.error || 'Update failed');
+      msgDiv.classList.add('error');
+      msgDiv.style.display = 'block';
+    }
+  } catch(e) {
+    msgDiv.textContent = '❌ Connection error';
+    msgDiv.classList.add('error');
+    msgDiv.style.display = 'block';
+  }
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch(API + '?action=user_stats');
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('statTrips').textContent = data.total_bookings || 0;
+      document.getElementById('statReviews').textContent = data.total_reviews || 0;
+    }
+  } catch(e) {
+    console.error('Stats error:', e);
+  }
+}
+
+async function loadBookings() {
+  try {
+    const res = await fetch(API + '?action=my_bookings');
+    const data = await res.json();
+    
+    console.log('Bookings response:', data);
+    
+    if (data.success && data.bookings && data.bookings.length > 0) {
+      // Ensure each booking has proper property title
+      allBookings = data.bookings.map(booking => ({
+        ...booking,
+        title: booking.title || booking.property_title || 'Property',
+        location: booking.location || booking.property_location || '',
+        image_url: booking.image_url || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&q=80'
+      }));
+      renderBookings('all');
+      renderUpcomingBooking();
+    } else {
+      allBookings = [];
+      document.getElementById('bookingList').innerHTML = '<div class="empty-state"><div class="icon">📭</div><div>No bookings yet</div><a href="listings.html" style="color:var(--rose);margin-top:8px;display:inline-block;">Browse stays →</a></div>';
+      document.getElementById('upcomingBooking').innerHTML = '<div class="empty-state"><div class="icon">🏡</div><div>No upcoming trips</div></div>';
+    }
+  } catch(e) {
+    console.error('Bookings error:', e);
+    document.getElementById('bookingList').innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><div>Error loading bookings</div></div>';
+  }
+}
+
+function renderUpcomingBooking() {
+  const container = document.getElementById('upcomingBooking');
+  const upcoming = allBookings.filter(b => b.status === 'confirmed' && new Date(b.check_in) > new Date());
+  upcoming.sort((a,b) => new Date(a.check_in) - new Date(b.check_in));
+  
+  if (upcoming.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🏡</div><div>No upcoming trips planned</div></div>';
+    return;
+  }
+  
+  const b = upcoming[0];
+  const nights = Math.round((new Date(b.check_out) - new Date(b.check_in)) / 86400000);
+  const propertyTitle = b.title || b.property_title || 'Property';
+  const propertyLocation = b.location || b.property_location || '';
+  
+  container.innerHTML = `
+    <div class="bk-card">
+      <div class="bk-img"><img src="${b.image_url || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&q=80'}" onerror="this.src='https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&q=80'"/></div>
+      <div class="bk-body">
+        <div class="bk-info">
+          <span class="bk-status upcoming">● Upcoming</span>
+          <div class="bk-title">${escapeHtml(propertyTitle)}</div>
+          <div class="bk-loc">📍 ${escapeHtml(propertyLocation)}</div>
+          <div class="bk-dates">
+            <div class="bk-date-item">📅 ${b.check_in} – ${b.check_out}</div>
+            <div class="bk-date-item">👥 ${b.guests} guests</div>
+            <div class="bk-date-item">🌙 ${nights} nights</div>
+          </div>
+        </div>
+        <div class="bk-price">$${parseFloat(b.total_price).toFixed(0)}<span>Total paid</span></div>
+      </div>
+    </div>
+  `;
+}
+
+// Add this helper function at the end of guest-dashboard.html script (before closing script tag)
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+function renderBookings(filter) {
+  const container = document.getElementById('bookingList');
+  let filtered = [...allBookings];
+  
+  if (filter === 'upcoming') {
+    filtered = filtered.filter(b => b.status === 'confirmed' && new Date(b.check_in) > new Date());
+  } else if (filter === 'completed') {
+    filtered = filtered.filter(b => b.status === 'confirmed' && new Date(b.check_out) < new Date());
+  } else if (filter === 'cancelled') {
+    filtered = filtered.filter(b => b.status === 'cancelled');
+  }
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div>No bookings found</div></div>';
+    return;
+  }
+  
+  container.innerHTML = filtered.map(b => {
+    let statusClass = 'upcoming';
+    if (b.status === 'cancelled') statusClass = 'cancelled';
+    else if (new Date(b.check_out) < new Date()) statusClass = 'completed';
+    
+    const nights = Math.round((new Date(b.check_out) - new Date(b.check_in)) / 86400000);
+    const canCancel = b.status !== 'cancelled' && new Date(b.check_in) > new Date();
+    
+    return `
+      <div class="bk-card" data-status="${statusClass}">
+        <div class="bk-img"><img src="${b.image_url || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&q=80'}" onerror="this.src='https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=300&q=80'"/></div>
+        <div class="bk-body">
+          <div class="bk-info">
+            <span class="bk-status ${statusClass}">● ${statusClass.charAt(0).toUpperCase() + statusClass.slice(1)}</span>
+            <div class="bk-title">${b.title || b.property_title || 'Property'}</div>
+            <div class="bk-loc">📍 ${b.location || ''} · Ref: ${b.ref_code || '#'+b.id}</div>
+            <div class="bk-dates">
+              <div class="bk-date-item">📅 ${b.check_in} – ${b.check_out}</div>
+              <div class="bk-date-item">👥 ${b.guests} guests · ${nights} nights</div>
+            </div>
+          </div>
+          <div class="bk-price">$${parseFloat(b.total_price).toFixed(0)}<span>Total paid</span></div>
+        </div>
+        ${canCancel ? `
+        <div class="bk-actions">
+          <button class="bk-btn danger" onclick="cancelBooking(${b.id})">Cancel Booking</button>
+        </div>
+        ` : (b.status === 'cancelled' ? '<div class="bk-actions"><button class="bk-btn" disabled style="opacity:0.5;">Cancelled</button></div>' : '')}
+      </div>
+    `;
+  }).join('');
+}
+
+async function cancelBooking(bookingId) {
+  if (!confirm('Are you sure you want to cancel this booking? You may be charged a cancellation fee.')) return;
+  
+  try {
+    const res = await fetch(API + '?action=cancel_booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: bookingId, reason: 'User requested cancellation' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Booking cancelled successfully', true);
+      await loadBookings();
+      await loadStats();
+    } else {
+      showToast(data.error || 'Cancellation failed');
+    }
+  } catch(e) {
+    showToast('Connection error');
+  }
+}
+
+function filterBookings(status, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBookings(status);
+}
+
+const sections = ['overview', 'bookings', 'profile'];
+
+function showSection(id) {
+  sections.forEach(s => {
+    const el = document.getElementById('sec-' + s);
+    if (el) el.style.display = s === id ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sb-item').forEach(item => {
+    item.classList.toggle('active', item.getAttribute('onclick')?.includes(`'${id}'`));
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'bookings') loadBookings();
+  if (id === 'profile') loadUserProfile();
+}
+
+function setMobActive(el) {
+  document.querySelectorAll('.mob-nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showLogoutModal() {
+  document.getElementById('logoutModal').classList.add('show');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutModal').classList.remove('show');
+}
+
+async function confirmLogout() {
+  try {
+    await fetch(API + '?action=logout', { method: 'POST' });
+    window.location.href = 'index.html';
+  } catch(e) {
+    window.location.href = 'index.html';
+  }
+}
+
+const root = document.documentElement;
+const saved = localStorage.getItem('sn-theme') || 'light';
+root.setAttribute('data-theme', saved);
+const tb = document.getElementById('themeBtn');
+tb.textContent = saved === 'dark' ? '☀️' : '🌙';
+tb.addEventListener('click', () => {
+  const n = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  root.setAttribute('data-theme', n);
+  localStorage.setItem('sn-theme', n);
+  tb.textContent = n === 'dark' ? '☀️' : '🌙';
+});
+
+function showToast(msg, ok = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (ok ? ' ok' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Page load pe user ka naam show karo
+document.addEventListener('DOMContentLoaded', async function() {
+  const loggedIn = await checkAuth();
+  if (!loggedIn) return;
+});
+
+// Profile page pe naam automatically aa jaye
+document.getElementById('editFullName').value = currentUser?.name || '';
+</script>
+</body>
+</html>

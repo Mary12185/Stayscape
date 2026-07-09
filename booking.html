@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>StayScape — Confirm & Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#FF385C;--rose-d:#D93B5C;--rose-s:rgba(255,56,92,.1);
+  --bg:#fff;--bg2:#F8F6F3;--bg3:#EFEBE5;
+  --text:#1C1C1C;--text2:#6B6B6B;--text3:#BBBBBB;
+  --border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.15);
+  --card:#fff;--input-bg:#F8F6F3;
+  --shadow-s:0 2px 12px rgba(0,0,0,.07);
+  --shadow-m:0 8px 32px rgba(0,0,0,.11);
+  --shadow-l:0 20px 60px rgba(0,0,0,.14);
+}
+[data-theme=dark]{
+  --bg:#111;--bg2:#191919;--bg3:#242424;
+  --text:#F0F0F0;--text2:#909090;--text3:#444;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --card:#1E1E1E;--input-bg:#242424;
+  --shadow-s:0 2px 12px rgba(0,0,0,.4);
+  --shadow-m:0 8px 32px rgba(0,0,0,.5);
+  --shadow-l:0 20px 60px rgba(0,0,0,.65);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit;outline:none;border:none;background:none}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:9px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+.nav-inner{max-width:1240px;margin:0 auto;height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);display:flex;align-items:center;gap:6px;cursor:pointer;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.n-lnk{padding:8px 14px;border-radius:99px;font-size:.82rem;font-weight:600;border:1.5px solid var(--border2);color:var(--text);transition:all .2s;}
+.n-lnk:hover{border-color:var(--rose);color:var(--rose)}
+.n-solid{background:var(--rose);color:#fff;border-color:var(--rose);}
+.n-solid:hover{background:var(--rose-d)}
+.theme-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .2s;}
+.theme-btn:hover{background:var(--bg2)}
+
+/* BREADCRUMB */
+.breadcrumb{max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text2);}
+.breadcrumb a{color:var(--text2);transition:color .15s;}
+.breadcrumb a:hover{color:var(--rose)}
+
+/* MAIN CONTAINER */
+.main-container{max-width:1240px;margin:0 auto;padding:0 24px 60px;display:grid;grid-template-columns:1fr 420px;gap:48px;align-items:start;}
+
+/* LEFT SECTION - BOOKING FORM */
+.booking-summary{background:var(--card);border-radius:24px;border:1px solid var(--border);overflow:hidden;}
+.prop-preview{display:flex;gap:16px;padding:20px;border-bottom:1px solid var(--border);}
+.prop-img{width:100px;height:100px;border-radius:12px;overflow:hidden;flex-shrink:0;}
+.prop-img img{width:100%;height:100%;object-fit:cover;}
+.prop-info h2{font-size:1rem;font-weight:700;margin-bottom:4px;line-height:1.3;}
+.prop-info .prop-loc{font-size:.72rem;color:var(--text2);margin-bottom:6px;}
+.prop-rating{display:flex;align-items:center;gap:4px;font-size:.75rem;}
+.prop-rating .star{color:var(--rose);}
+
+/* Form Sections */
+.form-section{padding:24px;}
+.form-title{font-size:1.1rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.form-title .step{width:28px;height:28px;border-radius:50%;background:var(--rose);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;}
+.dates-box{background:var(--bg2);border-radius:16px;padding:20px;margin-bottom:24px;}
+.date-row{display:flex;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.date-label{font-size:.75rem;color:var(--text2);}
+.date-value{font-weight:700;font-size:.9rem;}
+.nights-info{font-size:.8rem;color:var(--rose);margin-top:6px;}
+
+.input-group{margin-bottom:20px;}
+.input-group label{display:block;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:6px;}
+.input-group input,.input-group select,.input-group textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:12px;font-size:.88rem;background:var(--input-bg);color:var(--text);transition:border-color .2s;}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{border-color:var(--rose);outline:none;}
+.input-group textarea{resize:vertical;min-height:80px;}
+
+.row-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* Payment Methods */
+.payment-methods{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
+.payment-option{display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--border2);border-radius:14px;cursor:pointer;transition:all .2s;}
+.payment-option:hover{border-color:var(--rose);background:var(--rose-s);}
+.payment-option.selected{border-color:var(--rose);background:var(--rose-s);}
+.payment-option input{width:18px;height:18px;accent-color:var(--rose);cursor:pointer;}
+.payment-option .pay-icon{font-size:1.3rem;}
+.payment-option .pay-name{font-weight:700;font-size:.88rem;flex:1;}
+
+/* Card Details Form */
+.card-details{background:var(--bg2);border-radius:16px;padding:20px;margin-top:12px;margin-bottom:24px;display:none;}
+.card-details.show{display:block;}
+.card-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+
+.book-confirm-btn{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--rose-d));color:#fff;font-size:1rem;font-weight:700;margin-top:16px;transition:all .2s;box-shadow:0 4px 20px rgba(255,56,92,.32);}
+.book-confirm-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,56,92,.42);}
+.book-confirm-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* RIGHT SECTION - PRICE DETAILS */
+.price-card{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:24px;position:sticky;top:84px;}
+.price-title{font-size:1rem;font-weight:700;margin-bottom:20px;}
+.price-breakdown{display:flex;flex-direction:column;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.price-line{display:flex;justify-content:space-between;font-size:.88rem;color:var(--text2);}
+.price-line span:last-child{color:var(--text);font-weight:500;}
+.price-total{display:flex;justify-content:space-between;font-size:1rem;font-weight:800;margin-bottom:16px;}
+.cancellation-policy{background:var(--bg2);border-radius:12px;padding:14px;font-size:.78rem;color:var(--text2);text-align:center;margin-top:16px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:var(--bg);padding:12px 22px;border-radius:12px;font-size:.82rem;font-weight:600;box-shadow:var(--shadow-l);z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--rose);}
+.toast.error{background:#e74c3c;}
+
+/* LOADING */
+.loading{text-align:center;padding:60px;color:var(--text2);}
+.spinner{width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--rose);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:1024px){
+  .main-container{grid-template-columns:1fr;}
+  .price-card{position:static;margin-top:24px;}
+}
+@media(max-width:640px){
+  .row-2col,.card-row{grid-template-columns:1fr;}
+  .prop-preview{flex-direction:column;align-items:center;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo" id="logoBtn"><span class="logo-dot"></span>StayScape</div>
+    <div class="nav-right">
+      <button class="theme-btn" id="themeBtn">🌙</button>
+      <a href="login.html" class="n-lnk" id="loginBtn">Log in</a>
+      <a href="sign-up.html" class="n-lnk n-solid" id="signupBtn">Sign up</a>
+    </div>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="index.html">Home</a>
+  <span>/</span>
+  <a href="listings.html">Stays</a>
+  <span>/</span>
+  <a href="property-detail.html" id="propertyDetailLink">Property</a>
+  <span>/</span>
+  <span style="color:var(--text)">Confirm & Book</span>
+</div>
+
+<div class="main-container" id="mainContainer">
+  <div class="loading" id="loadingState">
+    <div class="spinner"></div>
+    <p>Loading booking details...</p>
+  </div>
+  
+  <div id="bookingContent" style="display:none;">
+    <!-- LEFT SECTION -->
+    <div class="booking-summary">
+      <div class="prop-preview">
+        <div class="prop-img"><img id="propImg" src="" alt="Property"/></div>
+        <div class="prop-info">
+          <h2 id="propTitle">Loading...</h2>
+          <div class="prop-loc" id="propLoc">📍 Loading...</div>
+          <div class="prop-rating"><span class="star">★</span> <span id="propRating">0</span> · <span id="propReviews">0</span> reviews</div>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <div class="form-title"><span class="step">1</span> Your trip dates</div>
+        <div class="dates-box">
+          <div class="date-row">
+            <span class="date-label">Check-in</span>
+            <span class="date-value" id="checkinDate">--</span>
+          </div>
+          <div class="date-row">
+            <span class="date-label">Check-out</span>
+            <span class="date-value" id="checkoutDate">--</span>
+          </div>
+          <div class="nights-info" id="nightsInfo">0 nights</div>
+        </div>
+        
+        <div class="form-title"><span class="step">2</span> Guest details</div>
+        <div class="row-2col">
+          <div class="input-group"><label>First name</label><input type="text" id="firstName" placeholder="John"/></div>
+          <div class="input-group"><label>Last name</label><input type="text" id="lastName" placeholder="Doe"/></div>
+        </div>
+        <div class="input-group"><label>Email address</label><input type="email" id="email" placeholder="john@example.com"/></div>
+        <div class="input-group"><label>Phone number</label><input type="tel" id="phone" placeholder="+1234567890"/></div>
+        <div class="input-group"><label>Special requests (optional)</label><textarea id="specialRequests" placeholder="Any special requests or notes for the host..."></textarea></div>
+        
+        <div class="form-title"><span class="step">3</span> Payment method</div>
+        <div class="payment-methods" id="paymentMethods">
+          <div class="payment-option selected" data-pay="card">
+            <input type="radio" name="payment" value="card" checked/> <span class="pay-icon">💳</span> <span class="pay-name">Credit / Debit Card</span>
+          </div>
+          <div class="payment-option" data-pay="paypal">
+            <input type="radio" name="payment" value="paypal"/> <span class="pay-icon">🅿️</span> <span class="pay-name">PayPal</span>
+          </div>
+          <div class="payment-option" data-pay="gpay">
+            <input type="radio" name="payment" value="gpay"/> <span class="pay-icon">📱</span> <span class="pay-name">Google Pay / Apple Pay</span>
+          </div>
+        </div>
+        
+        <!-- Card Details Form -->
+        <div class="card-details" id="cardDetails">
+          <div class="input-group"><label>Card Number</label><input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
+          <div class="row-2col">
+            <div class="input-group"><label>Expiry Date</label><input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"/></div>
+            <div class="input-group"><label>CVV</label><input type="password" id="cardCvv" placeholder="123" maxlength="4"/></div>
+          </div>
+          <div class="input-group"><label>Cardholder Name</label><input type="text" id="cardName" placeholder="John Doe"/></div>
+        </div>
+        
+        <button class="book-confirm-btn" id="confirmBookBtn">Confirm & Book</button>
+      </div>
+    </div>
+    
+    <!-- RIGHT SECTION -->
+    <div class="price-card">
+      <div class="price-title">Price details</div>
+      <div class="price-breakdown" id="priceBreakdown">
+        <div class="price-line"><span id="pricePerNightLabel">$0 × 0 nights</span><span id="subtotal">$0</span></div>
+        <div class="price-line"><span>Cleaning fee</span><span>$120</span></div>
+        <div class="price-line"><span>Service fee</span><span>$189</span></div>
+      </div>
+      <div class="price-total"><span>Total (USD)</span><span id="totalPrice">$0</span></div>
+      <div class="cancellation-policy">🔒 Free cancellation within 48 hours of booking. No charge to your card until confirmation.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================
+   ALL PROPERTIES DATA
+============================================ */
+const allProperties = [
+  {id:1,title:'Cliffside Villa with Infinity Pool',loc:'Santorini, Greece',cat:'villa',price:420,rating:4.97,reviews:284,beds:3,baths:2,guests:6,img:'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=500&q=80',badge:'Guest Fav',bt:'g',amenities:['wifi','pool','ac','kitchen'],type:'villa',host:'Elena',superhost:true},
+  {id:2,title:'Sleek City Loft, Barcelona',loc:'Barcelona, Spain',cat:'apartment',price:185,rating:4.89,reviews:412,beds:1,baths:1,guests:2,img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&q=80',badge:'New',bt:'n',amenities:['wifi','ac','kitchen'],type:'apartment',host:'Marc',superhost:false},
+  {id:3,title:'Cozy Log Cabin by the Lake',loc:'Vermont, USA',cat:'cabin',price:230,rating:4.95,reviews:196,beds:2,baths:1,guests:4,img:'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=500&q=80',badge:null,bt:'',amenities:['wifi','parking','kitchen','pet'],type:'cabin',host:'John',superhost:true},
+  {id:4,title:'Private Beachfront Bungalow',loc:'Koh Samui, Thailand',cat:'beach',price:310,rating:4.92,reviews:338,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&q=80',badge:'Top Rated',bt:'t',amenities:['wifi','pool','ac','waterfront'],type:'beachfront',host:'Somchai',superhost:true},
+  {id:5,title:'Alpine Chalet Ski-in Ski-out',loc:'Zermatt, Switzerland',cat:'mountain',price:680,rating:4.98,reviews:97,beds:4,baths:3,guests:8,img:'https://images.unsplash.com/photo-1455156218388-5e61b526818b?w=500&q=80',badge:null,bt:'',amenities:['wifi','parking','ac','kitchen','pool'],type:'mountain',host:'Hans',superhost:true},
+  {id:6,title:'Penthouse Suite Harbour Views',loc:'Sydney, Australia',cat:'luxury',price:890,rating:5.0,reviews:52,beds:3,baths:3,guests:6,img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=500&q=80',badge:'Luxury',bt:'g',amenities:['wifi','pool','ac','kitchen'],type:'luxury',host:'Emma',superhost:true},
+  {id:7,title:'Tropical Garden Pool Villa',loc:'Ubud, Bali',cat:'villa',price:270,rating:4.93,reviews:221,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80',badge:null,bt:'',amenities:['wifi','pool','ac','kitchen','parking'],type:'villa',host:'Ketut',superhost:true},
+  {id:8,title:'Historic Brownstone Apartment',loc:'Brooklyn, New York',cat:'apartment',price:155,rating:4.85,reviews:389,beds:2,baths:1,guests:4,img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&q=80',badge:null,bt:'',amenities:['wifi','ac','kitchen'],type:'apartment',host:'Sarah',superhost:false},
+  {id:9,title:'Oceanfront Glass House',loc:'Malibu, California',cat:'luxury',price:1200,rating:4.99,reviews:43,beds:4,baths:4,guests:8,img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=500&q=80',badge:'Premium',bt:'g',amenities:['wifi','pool','ac','kitchen','waterfront','parking'],type:'luxury',host:'David',superhost:true},
+  {id:10,title:'Mountain View Treehouse',loc:'Asheville, NC',cat:'tiny',price:195,rating:4.91,reviews:167,beds:1,baths:1,guests:2,img:'https://images.unsplash.com/photo-1520984032042-162d526883f9?w=500&q=80',badge:'Unique',bt:'n',amenities:['wifi','ac','kitchen','pet'],type:'tiny',host:'Lisa',superhost:true},
+  {id:11,title:'Tuscany Farmhouse Retreat',loc:'Florence, Italy',cat:'farm',price:340,rating:4.96,reviews:118,beds:3,baths:2,guests:6,img:'https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=500&q=80',badge:null,bt:'',amenities:['wifi','parking','kitchen','pet'],type:'farm',host:'Giovanni',superhost:true},
+  {id:12,title:'Rooftop Apartment with City View',loc:'Dubai, UAE',cat:'city',price:420,rating:4.88,reviews:203,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&q=80',badge:null,bt:'',amenities:['wifi','pool','ac','kitchen'],type:'apartment',host:'Ahmed',superhost:false}
+];
+
+/* ============================================
+   GET URL PARAMETERS
+============================================ */
+const urlParams = new URLSearchParams(window.location.search);
+const propertyId = parseInt(urlParams.get('id')) || 1;
+const checkinDate = urlParams.get('checkin') || '';
+const checkoutDate = urlParams.get('checkout') || '';
+const guestCount = parseInt(urlParams.get('guests')) || 2;
+
+/* ============================================
+   LOAD PROPERTY & INITIALIZE
+============================================ */
+let currentProperty = allProperties.find(p => p.id === propertyId);
+if (!currentProperty) currentProperty = allProperties[0];
+
+function calculateNights() {
+  if (!checkinDate || !checkoutDate) return 0;
+  const checkin = new Date(checkinDate);
+  const checkout = new Date(checkoutDate);
+  const diffTime = Math.abs(checkout - checkin);
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '--';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function updatePriceDisplay() {
+  const nights = calculateNights();
+  const subtotal = currentProperty.price * nights;
+  const cleaningFee = 120;
+  const serviceFee = 189;
+  const total = subtotal + cleaningFee + serviceFee;
+  
+  document.getElementById('pricePerNightLabel').innerHTML = `$${currentProperty.price} × ${nights} nights`;
+  document.getElementById('subtotal').innerHTML = `$${subtotal}`;
+  document.getElementById('totalPrice').innerHTML = `$${total}`;
+  document.getElementById('nightsInfo').innerHTML = `${nights} nights`;
+}
+
+function loadBookingPage() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('bookingContent').style.display = 'block';
+  
+  document.getElementById('propImg').src = currentProperty.img;
+  document.getElementById('propTitle').textContent = currentProperty.title;
+  document.getElementById('propLoc').innerHTML = `📍 ${currentProperty.loc}`;
+  document.getElementById('propRating').textContent = currentProperty.rating;
+  document.getElementById('propReviews').textContent = currentProperty.reviews;
+  
+  document.getElementById('checkinDate').textContent = formatDate(checkinDate);
+  document.getElementById('checkoutDate').textContent = formatDate(checkoutDate);
+  
+  const detailLink = document.getElementById('propertyDetailLink');
+  if (detailLink) detailLink.href = `property-detail.html?id=${propertyId}`;
+  
+  updatePriceDisplay();
+  
+  const guestNote = document.createElement('div');
+  guestNote.className = 'date-row';
+  guestNote.innerHTML = `<span class="date-label">Guests</span><span class="date-value">${guestCount} guest${guestCount > 1 ? 's' : ''}</span>`;
+  document.querySelector('.dates-box').appendChild(guestNote);
+}
+
+/* ============================================
+   PAYMENT METHOD SELECTION WITH CARD FORM
+============================================ */
+const cardDetails = document.getElementById('cardDetails');
+
+document.querySelectorAll('.payment-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    const radio = opt.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+    
+    // Show card details only for card payment
+    const paymentMethod = opt.getAttribute('data-pay');
+    if (paymentMethod === 'card') {
+      cardDetails.classList.add('show');
+    } else {
+      cardDetails.classList.remove('show');
+    }
+  });
+});
+
+// Initially show card details since card is selected by default
+cardDetails.classList.add('show');
+
+/* ============================================
+   TOAST FUNCTION
+============================================ */
+function showToast(msg, isOk = false, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast';
+  if (isOk) toast.classList.add('ok');
+  if (isError) toast.classList.add('error');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+/* ============================================
+   VALIDATE CARD DETAILS
+============================================ */
+function validateCardDetails() {
+  // Check which payment method is selected
+  let selectedMethod = 'card';
+  document.querySelectorAll('input[name="payment"]').forEach(radio => {
+    if (radio.checked) selectedMethod = radio.value;
+  });
+  
+  if (selectedMethod !== 'card') {
+    return true; // Non-card payments don't need card details
+  }
+  
+  const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+  const cardExpiry = document.getElementById('cardExpiry').value;
+  const cardCvv = document.getElementById('cardCvv').value;
+  const cardName = document.getElementById('cardName').value.trim();
+  
+  if (!cardNumber || cardNumber.length < 13) {
+    showToast('⚠️ Please enter a valid card number', false, true);
+    return false;
+  }
+  if (!cardExpiry || !cardExpiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
+    showToast('⚠️ Please enter valid expiry date (MM/YY)', false, true);
+    return false;
+  }
+  if (!cardCvv || cardCvv.length < 3) {
+    showToast('⚠️ Please enter valid CVV', false, true);
+    return false;
+  }
+  if (!cardName) {
+    showToast('⚠️ Please enter cardholder name', false, true);
+    return false;
+  }
+  
+  return true;
+}
+
+/* ============================================
+   FORMAT CARD NUMBER
+============================================ */
+document.getElementById('cardNumber').addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\s/g, '');
+  if (value.length > 16) value = value.slice(0, 16);
+  let formatted = '';
+  for (let i = 0; i < value.length; i++) {
+    if (i > 0 && i % 4 === 0) formatted += ' ';
+    formatted += value[i];
+  }
+  e.target.value = formatted;
+});
+
+document.getElementById('cardExpiry').addEventListener('input', function(e) {
+  let value = e.target.value.replace(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+  }
+  e.target.value = value.slice(0, 5);
+});
+
+document.getElementById('cardCvv').addEventListener('input', function(e) {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+});
+
+/* ============================================
+   BOOKING CONFIRMATION - FIXED
+============================================ */
+const API = 'api.php';
+
+async function confirmBooking() {
+  // Validate guest details
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  
+  if (!firstName || !lastName) {
+    showToast('⚠️ Please enter your full name', false, true);
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    showToast('⚠️ Please enter a valid email address', false, true);
+    return;
+  }
+  if (!phone) {
+    showToast('⚠️ Please enter your phone number', false, true);
+    return;
+  }
+  
+  // Validate card details if card payment selected
+  if (!validateCardDetails()) {
+    return;
+  }
+  
+  let paymentMethod = 'card';
+  document.querySelectorAll('input[name="payment"]').forEach(radio => {
+    if (radio.checked) paymentMethod = radio.value;
+  });
+  
+  const specialRequests = document.getElementById('specialRequests').value;
+  const nights = calculateNights();
+  const totalAmount = (currentProperty.price * nights) + 120 + 189;
+  
+  const confirmBtn = document.getElementById('confirmBookBtn');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Processing...';
+  
+  try {
+    // Check login status
+    const meRes = await fetch(API + '?action=me');
+    const meData = await meRes.json();
+    
+    if (!meData.loggedIn) {
+      showToast('🔐 Please login to complete booking', false, true);
+      setTimeout(() => {
+        window.location.href = 'login.html?redirect=booking.html?id=' + propertyId + '&checkin=' + checkinDate + '&checkout=' + checkoutDate + '&guests=' + guestCount;
+      }, 1500);
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm & Book';
+      return;
+    }
+    
+    // Prepare booking data
+    const bookingData = {
+      property_id: propertyId,
+      check_in: checkinDate,
+      check_out: checkoutDate,
+      guests: guestCount,
+      total: totalAmount
+    };
+    
+    console.log('Sending booking data:', bookingData);
+    
+    const bookRes = await fetch(API + '?action=create_booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
+    });
+    
+    const bookData = await bookRes.json();
+    console.log('Booking response:', bookData);
+    
+    if (bookData.success === true) {
+      showToast('✅ Booking confirmed! Redirecting...', true);
+      setTimeout(() => {
+        window.location.href = 'guest-dashboard.html';
+      }, 2000);
+    } else {
+      showToast('❌ Booking failed: ' + (bookData.error || 'Unknown error'), false, true);
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm & Book';
+    }
+    
+  } catch(error) {
+    console.error('Booking error:', error);
+    showToast('❌ Network error. Please try again.', false, true);
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Confirm & Book';
+  }
+}
+
+document.getElementById('confirmBookBtn').addEventListener('click', confirmBooking);
+
+/* ============================================
+   THEME & NAVIGATION
+============================================ */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('sn-theme') || 'light';
+root.setAttribute('data-theme', savedTheme);
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+themeBtn.addEventListener('click', () => {
+  const newTheme = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  root.setAttribute('data-theme', newTheme);
+  localStorage.setItem('sn-theme', newTheme);
+  themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+});
+
+document.getElementById('logoBtn').addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
+
+/* ============================================
+   CHECK AUTH STATUS FOR UI
+============================================ */
+async function checkAuthStatus() {
+  try {
+    const res = await fetch(API + '?action=me');
+    const data = await res.json();
+    if (data.loggedIn) {
+      const loginBtn = document.getElementById('loginBtn');
+      const signupBtn = document.getElementById('signupBtn');
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (signupBtn) signupBtn.style.display = 'none';
+      
+      if (data.user && data.user.name) {
+        const nameParts = data.user.name.split(' ');
+        if (nameParts[0]) document.getElementById('firstName').value = nameParts[0];
+        if (nameParts[1]) document.getElementById('lastName').value = nameParts[1];
+        if (data.user.email) document.getElementById('email').value = data.user.email;
+        document.getElementById('cardName').value = data.user.name;
+      }
+    }
+  } catch(e) {
+    console.log('Auth check failed:', e);
+  }
+}
+
+loadBookingPage();
+checkAuthStatus();
+</script>
+</body>
+</html>

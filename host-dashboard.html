@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Host Dashboard — StayScape</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f7f7f7;color:#111;}
+.nav{height:75px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-bottom:1px solid #eee;}
+.logo{font-family:'Playfair Display',serif;font-size:1.9rem;color:#ff385c;font-weight:700;}
+.nav-right{display:flex;gap:16px;align-items:center;}
+.nav-right a{text-decoration:none;color:#111;font-weight:600;font-size:.9rem;}
+.logout-btn{background:none;border:1.5px solid #ddd;padding:8px 16px;border-radius:10px;color:#111;font-weight:600;cursor:pointer;font-size:.88rem;}
+.logout-btn:hover{border-color:#ff385c;color:#ff385c;}
+.container{max-width:1200px;margin:auto;padding:50px 25px;}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+.top h1{font-size:2.4rem;}
+.add-btn{background:#ff385c;color:#fff;padding:14px 22px;border-radius:14px;text-decoration:none;font-weight:700;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:50px;}
+.stat{background:#fff;padding:30px;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.05);}
+.stat h3{font-size:.95rem;margin-bottom:12px;color:#666;}
+.stat p{font-size:2rem;font-weight:700;}
+.properties{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;}
+.card{background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.05);}
+.card img{width:100%;height:230px;object-fit:cover;}
+.card-content{padding:24px;}
+.card-content h2{font-size:1.2rem;margin-bottom:10px;}
+.card-content p{color:#666;margin-bottom:16px;}
+.price{font-weight:700;font-size:1rem;margin-bottom:18px;}
+.actions{display:flex;gap:12px;}
+.actions button{flex:1;padding:12px;border:none;border-radius:12px;font-weight:700;cursor:pointer;}
+.edit{background:#111;color:#fff;}
+.delete{background:#eee;color:#333;}
+.delete:hover{background:#ffe0e6;color:#c0392b;}
+.empty-props{background:#fff;padding:40px;border-radius:24px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.05);}
+.loading{text-align:center;padding:40px;color:#666;}
+@media(max-width:900px){
+  .stats,.properties{grid-template-columns:1fr;}
+  .top{flex-direction:column;gap:20px;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">StayScape</div>
+  <div class="nav-right">
+    <a href="index.html">Back to Website</a>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="top">
+    <h1>Host Dashboard</h1>
+    <a href="add-property.html" class="add-btn">+ Add Property</a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><h3>Total Earnings</h3><p id="statEarnings">...</p></div>
+    <div class="stat"><h3>Total Bookings</h3><p id="statBookings">...</p></div>
+    <div class="stat"><h3>Properties Listed</h3><p id="statProps">...</p></div>
+  </div>
+
+  <!-- PROPERTIES -->
+  <div class="properties" id="propertiesGrid">
+    <div class="loading">Loading properties...</div>
+  </div>
+</div>
+
+<script>
+const API = 'api.php';
+
+async function init() {
+  // Check login + host session
+  try {
+    const authRes  = await fetch(API + '?action=host_me', {
+      credentials: 'include'
+    });
+
+    const authData = await authRes.json();
+
+    if (!authData.loggedIn) {
+      window.location.href = 'host-login.html';
+      return;
+    }
+  } catch(e) {
+    window.location.href = 'host-login.html';
+    return;
+  }
+
+  loadStats();
+  loadProperties();
+}
+
+async function loadStats() {
+  try {
+    const res  = await fetch(API + '?action=host_stats');
+    const data = await res.json();
+
+    if (data.success) {
+      const earnings = data.total_earnings || 0;
+      const bookings = data.total_bookings || 0;
+      const props = data.properties_listed || 0;
+      
+      document.getElementById('statEarnings').textContent = '$' + parseFloat(earnings).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+      document.getElementById('statBookings').textContent = bookings;
+      document.getElementById('statProps').textContent = props;
+    } else {
+      // Fallback to show 0 if API fails
+      document.getElementById('statEarnings').textContent = '$0';
+      document.getElementById('statBookings').textContent = '0';
+      document.getElementById('statProps').textContent = '0';
+    }
+  } catch(e) {
+    console.error('Stats error:', e);
+    document.getElementById('statEarnings').textContent = '$0';
+    document.getElementById('statBookings').textContent = '0';
+    document.getElementById('statProps').textContent = '0';
+  }
+}
+
+async function loadProperties() {
+  const grid = document.getElementById('propertiesGrid');
+
+  try {
+    const res  = await fetch(API + '?action=host_properties');
+    const data = await res.json();
+
+    if (!data.success || data.properties.length === 0) {
+      grid.innerHTML =
+        '<div class="empty-props"><h2>No properties yet</h2><p>Add your first property now!</p></div>';
+      return;
+    }
+
+    grid.innerHTML = data.properties.map(p => `
+      <div class="card" id="prop-${p.id}">
+        <img src="${p.image_url || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80'}"
+             onerror="this.src='https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80'">
+        <div class="card-content">
+          <h2>${p.title}</h2>
+          <p>${p.location}</p>
+          <div class="price">$${parseFloat(p.price_night).toFixed(0)} / night</div>
+          <div class="actions">
+            <button class="edit" onclick="window.location.href='add-property.html?id=${p.id}'">Edit</button>
+            <button class="delete" onclick="deleteProperty(${p.id})">Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+
+  } catch(e) {
+    grid.innerHTML =
+      '<div class="empty-props"><p>Failed to load properties. Please check the server.</p></div>';
+  }
+}
+
+async function deleteProperty(id) {
+  if (!confirm('Are you sure you want to delete this property?')) return;
+
+  try {
+    const res  = await fetch(API + '?action=delete_property', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById('prop-' + id)?.remove();
+      loadStats();
+    } else {
+      alert('Delete failed: ' + (data.error || 'Unknown error'));
+    }
+
+  } catch(e) {
+    alert('Server connection failed.');
+  }
+}
+
+async function doLogout() {
+  await fetch(API + '?action=logout', { method: 'POST' });
+  window.location.href = 'index.html';
+}
+
+init();
+</script>
+</body>
+</html>

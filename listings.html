@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>StayScape — Advanced Filters & Listings</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* RESET + VARIABLES (same robust system) */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#FF385C;--rose-d:#D93B5C;--rose-s:rgba(255,56,92,.1);
+  --bg:#fff;--bg2:#F8F6F3;--bg3:#EFEBE5;
+  --text:#1C1C1C;--text2:#6B6B6B;--text3:#BBBBBB;
+  --border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.15);
+  --card:#fff;--input-bg:#F8F6F3;
+  --shadow-s:0 2px 12px rgba(0,0,0,.07);
+  --shadow-m:0 8px 32px rgba(0,0,0,.11);
+  --shadow-l:0 20px 60px rgba(0,0,0,.14);
+}
+[data-theme=dark]{
+  --bg:#111;--bg2:#191919;--bg3:#242424;
+  --text:#F0F0F0;--text2:#909090;--text3:#444;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --card:#1E1E1E;--input-bg:#242424;
+  --shadow-s:0 2px 12px rgba(0,0,0,.4);
+  --shadow-m:0 8px 32px rgba(0,0,0,.5);
+  --shadow-l:0 20px 60px rgba(0,0,0,.65);
+}
+html,body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select{font-family:inherit;outline:none;border:none;background:none}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--text3);border-radius:9px}
+
+/* NAV (unchanged core) */
+.nav{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+.nav-top{max-width:1380px;margin:0 auto;height:64px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;}
+.nav-pill{display:flex;align-items:center;background:var(--bg2);border:1.5px solid var(--border2);border-radius:40px;overflow:hidden;height:44px;flex:1;max-width:520px;}
+.np-inp{flex:1;padding:0 16px;font-size:.83rem;color:var(--text);}
+.np-inp::placeholder{color:var(--text3)}
+.np-sep{width:1px;height:22px;background:var(--border2);flex-shrink:0;}
+.np-lbl{padding:0 13px;font-size:.76rem;color:var(--text2);white-space:nowrap;cursor:pointer;}
+.np-btn{background:var(--rose);color:#fff;padding:0 18px;height:100%;font-weight:700;font-size:.8rem;display:flex;align-items:center;gap:5px;transition:background .2s;flex-shrink:0;}
+.np-btn:hover{background:var(--rose-d)}
+.nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.n-lnk{padding:8px 14px;border-radius:99px;font-size:.82rem;font-weight:600;border:1.5px solid var(--border2);color:var(--text);transition:all .2s;}
+.n-lnk:hover{border-color:var(--rose);color:var(--rose)}
+.n-solid{background:var(--rose);color:#fff;border-color:var(--rose);}
+.n-solid:hover{background:var(--rose-d)}
+.theme-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background .2s;}
+.theme-btn:hover{background:var(--bg2)}
+.cat-bar{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:64px;z-index:190;}
+.cat-row{max-width:1380px;margin:0 auto;padding:.6rem 24px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.15rem;overflow-x:auto;}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:.4rem .85rem;border-bottom:2px solid transparent;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;font-size:.62rem;font-weight:600;}
+.cat-item:hover{color:var(--text);border-color:var(--text3)}
+.cat-item.active{color:var(--text);border-color:var(--rose)}
+.cat-icon{font-size:1.2rem;}
+.wrap{max-width:1380px;margin:0 auto;padding:24px;display:grid;grid-template-columns:288px 1fr;gap:24px;align-items:start;}
+
+/* SIDEBAR (enhanced) */
+.sidebar{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.4rem;position:sticky;top:160px;max-height:calc(100vh - 180px);overflow-y:auto;}
+.sb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
+.sb-title{font-size:.95rem;font-weight:700;}
+.sb-reset{font-size:.73rem;color:var(--rose);font-weight:600;cursor:pointer;}
+.f-sec{padding-bottom:1.25rem;margin-bottom:1.25rem;border-bottom:1px solid var(--border);}
+.f-lbl{font-size:.67rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);margin-bottom:.8rem;}
+.price-row{display:flex;gap:.6rem;margin-bottom:.55rem;}
+.price-box{flex:1;display:flex;flex-direction:column;gap:3px;}
+.price-box small{font-size:.64rem;color:var(--text3);}
+.price-inp{width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:10px;font-size:.82rem;color:var(--text);background:var(--input-bg);transition:border-color .2s;}
+.price-inp:focus{border-color:var(--rose)}
+.range-sl{width:100%;accent-color:var(--rose);margin-top:.4rem;cursor:pointer;}
+.check-list{display:flex;flex-direction:column;gap:.52rem;}
+.chk{display:flex;align-items:center;gap:.6rem;cursor:pointer;}
+.chk input{accent-color:var(--rose);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.chk label{font-size:.82rem;cursor:pointer;flex:1;}
+.chk span{font-size:.68rem;color:var(--text3);}
+.pill-row,.star-row{display:flex;flex-wrap:wrap;gap:.4rem;}
+.pill-o,.star-o{padding:6px 12px;border-radius:99px;border:1.5px solid var(--border2);font-size:.74rem;font-weight:600;color:var(--text2);transition:all .2s;cursor:pointer;}
+.pill-o:hover,.pill-o.on,.star-o:hover,.star-o.on{border-color:var(--rose);background:var(--rose-s);color:var(--rose);}
+.apply-btn{width:100%;padding:12px;border-radius:12px;background:var(--rose);color:#fff;font-weight:700;font-size:.88rem;margin-top:1.1rem;transition:background .2s;box-shadow:0 4px 16px rgba(255,56,92,.28);}
+.apply-btn:hover{background:var(--rose-d)}
+.res-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;}
+.res-count{font-size:.875rem;color:var(--text2);}
+.sort-sel{padding:8px 14px;border:1.5px solid var(--border2);border-radius:99px;font-size:.8rem;color:var(--text);background:var(--card);cursor:pointer;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:18px;}
+.prop-card{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform .3s cubic-bezier(.34,1.2,.64,1),box-shadow .25s;animation:cardIn .4s both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.prop-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-l)}
+.pc-img{position:relative;aspect-ratio:4/3;overflow:hidden;}
+.pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s;}
+.prop-card:hover .pc-img img{transform:scale(1.07)}
+.pc-badge{position:absolute;top:10px;left:10px;font-size:.62rem;font-weight:700;padding:3px 9px;border-radius:99px;box-shadow:var(--shadow-s);}
+.pc-badge.n{background:var(--rose);color:#fff}
+.pc-badge.g{background:#111;color:#E8A838}
+.pc-badge.t{background:rgba(255,255,255,.95);color:var(--text)}
+.pc-body{padding:12px 14px 15px;}
+.pc-loc{font-size:.68rem;color:var(--text2);margin-bottom:2px;}
+.pc-title{font-size:.87rem;font-weight:700;line-height:1.3;margin-bottom:5px;}
+.pc-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:8px;}
+.pc-tag{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--bg2);color:var(--text2);}
+.pc-foot{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);}
+.pc-price{font-size:.92rem;font-weight:700;}
+.pc-price span{font-size:.72rem;font-weight:400;color:var(--text2);}
+.pc-rat{display:flex;align-items:center;gap:3px;font-size:.78rem;font-weight:600;}
+.pc-star{color:var(--rose);}
+.empty{grid-column:1/-1;text-align:center;padding:4rem;color:var(--text2);}
+.pages{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:2rem;flex-wrap:wrap;}
+.pg{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:600;border:1.5px solid var(--border2);color:var(--text2);transition:all .2s;cursor:pointer;}
+.pg:hover,.pg.on{border-color:var(--rose);background:var(--rose);color:#fff;}
+.pg.wide{width:auto;padding:0 14px;}
+.map-fab{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:12px 22px;border-radius:99px;font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:7px;box-shadow:var(--shadow-l);z-index:300;transition:all .2s;}
+.mob-filter-fab{display:none;position:fixed;bottom:5.2rem;left:50%;transform:translateX(-50%);background:var(--rose);color:#fff;padding:11px 20px;border-radius:99px;font-size:.8rem;font-weight:700;gap:6px;z-index:300;}
+.to-top{position:fixed;bottom:2rem;right:2rem;z-index:300;width:42px;height:42px;border-radius:50%;background:var(--rose);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(255,56,92,.4);opacity:0;pointer-events:none;transition:all .3s;}
+.to-top.show{opacity:1;pointer-events:all}
+.sb-overlay,.sb-drawer{display:none;}
+@media(max-width:1024px){
+  .wrap{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .mob-filter-fab{display:flex}
+}
+@media(max-width:640px){
+  .nav-pill{display:none}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-top"><div class="logo" id="logoBtn"><span class="logo-dot"></span>StayScape</div><div class="nav-pill"><input class="np-inp" type="text" placeholder="Where are you going?" id="searchInp"/><div class="np-sep"></div><div class="np-lbl">Any dates</div><div class="np-sep"></div><div class="np-lbl">Any guests</div><button class="np-btn" id="globalSearchBtn">🔍 Search</button></div><div class="nav-right"><button class="theme-btn" id="themeBtn">🌙</button><a href="login.html" class="n-lnk" id="loginBtn">Log in</a><a href="sign-up.html" class="n-lnk n-solid" id="signupBtn">Sign up</a></div></div>
+<div class="cat-bar"><div class="cat-row" id="catRow"><div class="cat-item active" data-cat="all"><span class="cat-icon">✨</span><span class="cat-label">All</span></div><div class="cat-item" data-cat="beach"><span class="cat-icon">🏖️</span><span class="cat-label">Beachfront</span></div><div class="cat-item" data-cat="cabin"><span class="cat-icon">🌲</span><span class="cat-label">Cabins</span></div><div class="cat-item" data-cat="villa"><span class="cat-icon">🏡</span><span class="cat-label">Villas</span></div><div class="cat-item" data-cat="apartment"><span class="cat-icon">🏙️</span><span class="cat-label">Apartments</span></div><div class="cat-item" data-cat="mountain"><span class="cat-icon">⛰️</span><span class="cat-label">Mountain</span></div><div class="cat-item" data-cat="luxury"><span class="cat-icon">💎</span><span class="cat-label">Luxury</span></div><div class="cat-item" data-cat="pool"><span class="cat-icon">🏊</span><span class="cat-label">Pools</span></div><div class="cat-item" data-cat="farm"><span class="cat-icon">🌾</span><span class="cat-label">Farms</span></div><div class="cat-item" data-cat="tiny"><span class="cat-icon">🏕️</span><span class="cat-label">Tiny Homes</span></div><div class="cat-item" data-cat="city"><span class="cat-icon">🌆</span><span class="cat-label">City View</span></div></div></div></nav>
+
+<div class="wrap">
+  <aside class="sidebar" id="desktopSidebar">
+    <div class="sb-head"><span class="sb-title">🎛️ Filters</span><button class="sb-reset" id="resetFiltersBtn">Reset all</button></div>
+    <div class="f-sec"><div class="f-lbl">Price Per Night</div><div class="price-row"><div class="price-box"><small>Min ($)</small><input class="price-inp" type="number" placeholder="0" id="minPriceFilter" value="0"/></div><div class="price-box"><small>Max ($)</small><input class="price-inp" type="number" placeholder="2000" id="maxPriceFilter" value="2000"/></div></div><input class="range-sl" type="range" min="0" max="2000" value="2000" id="priceRangeSlider"/></div>
+    <div class="f-sec"><div class="f-lbl">Property Type</div><div class="check-list" id="propertyTypeFilters"></div></div>
+    <div class="f-sec"><div class="f-lbl">Bedrooms</div><div class="pill-row" id="bedPills"></div></div>
+    <div class="f-sec"><div class="f-lbl">Guest Rating</div><div class="star-row" id="starRow"></div></div>
+    <div class="f-sec"><div class="f-lbl">Amenities</div><div class="check-list" id="amenitiesFilters"></div></div>
+    <button class="apply-btn" id="applyFiltersBtn">Show Results</button>
+  </aside>
+
+  <div><div class="res-top"><div class="res-count">Showing <strong id="resCount">0</strong> stays</div><select class="sort-sel" id="sortSelect"><option value="rec">⭐ Recommended</option><option value="asc">💰 Price: Low → High</option><option value="desc">💎 Price: High → Low</option><option value="rat">🏆 Top Rated</option></select></div>
+    <div class="grid" id="propGrid"></div>
+    <div class="pages" id="paginationContainer"></div>
+  </div>
+</div>
+
+<div class="sb-overlay" id="sbOverlay" onclick="closeMobSidebar()"></div><div class="sb-drawer" id="sbDrawer"><div class="sb-drawer-head"><span style="font-weight:700">🎛️ Filters</span><button onclick="closeMobSidebar()">✕</button></div><button class="apply-btn" onclick="closeMobSidebar(); applyAllFilters()">Apply</button></div>
+<button class="map-fab">🗺️ Show Map</button><button class="mob-filter-fab" onclick="openMobSidebar()">⚙️ Filters</button><button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ---------- DATA (enriched with amenity arrays & types) ----------
+const rawProps = [
+  {id:1,title:'Cliffside Villa with Infinity Pool',loc:'Santorini, Greece',cat:'villa',price:420,rating:4.97,reviews:284,beds:3,baths:2,guests:6,img:'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=500&q=80',badge:'Guest Fav',bt:'g',amenities:['wifi','pool','ac','kitchen'],type:'villa'},
+  {id:2,title:'Sleek City Loft, Barcelona',loc:'Barcelona, Spain',cat:'apartment',price:185,rating:4.89,reviews:412,beds:1,baths:1,guests:2,img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&q=80',badge:'New',bt:'n',amenities:['wifi','ac','kitchen'],type:'apartment'},
+  {id:3,title:'Cozy Log Cabin by the Lake',loc:'Vermont, USA',cat:'cabin',price:230,rating:4.95,reviews:196,beds:2,baths:1,guests:4,img:'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=500&q=80',badge:null,bt:'',amenities:['wifi','parking','kitchen','pet'],type:'cabin'},
+  {id:4,title:'Private Beachfront Bungalow',loc:'Koh Samui, Thailand',cat:'beach',price:310,rating:4.92,reviews:338,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&q=80',badge:'Top Rated',bt:'t',amenities:['wifi','pool','ac','waterfront'],type:'beachfront'},
+  {id:5,title:'Alpine Chalet Ski-in Ski-out',loc:'Zermatt, Switzerland',cat:'mountain',price:680,rating:4.98,reviews:97,beds:4,baths:3,guests:8,img:'https://images.unsplash.com/photo-1455156218388-5e61b526818b?w=500&q=80',badge:null,bt:'',amenities:['wifi','parking','ac','kitchen','pool'],type:'mountain'},
+  {id:6,title:'Penthouse Suite Harbour Views',loc:'Sydney, Australia',cat:'luxury',price:890,rating:5.0,reviews:52,beds:3,baths:3,guests:6,img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=500&q=80',badge:'Luxury',bt:'g',amenities:['wifi','pool','ac','kitchen'],type:'luxury'},
+  {id:7,title:'Tropical Garden Pool Villa',loc:'Ubud, Bali',cat:'villa',price:270,rating:4.93,reviews:221,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80',badge:null,bt:'',amenities:['wifi','pool','ac','kitchen','parking'],type:'villa'},
+  {id:8,title:'Historic Brownstone Apartment',loc:'Brooklyn, New York',cat:'apartment',price:155,rating:4.85,reviews:389,beds:2,baths:1,guests:4,img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&q=80',badge:null,bt:'',amenities:['wifi','ac','kitchen'],type:'apartment'},
+  {id:9,title:'Oceanfront Glass House',loc:'Malibu, California',cat:'luxury',price:1200,rating:4.99,reviews:43,beds:4,baths:4,guests:8,img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=500&q=80',badge:'Premium',bt:'g',amenities:['wifi','pool','ac','kitchen','waterfront','parking'],type:'luxury'},
+  {id:10,title:'Mountain View Treehouse',loc:'Asheville, NC',cat:'tiny',price:195,rating:4.91,reviews:167,beds:1,baths:1,guests:2,img:'https://images.unsplash.com/photo-1520984032042-162d526883f9?w=500&q=80',badge:'Unique',bt:'n',amenities:['wifi','ac','kitchen','pet'],type:'tiny'},
+  {id:11,title:'Tuscany Farmhouse Retreat',loc:'Florence, Italy',cat:'farm',price:340,rating:4.96,reviews:118,beds:3,baths:2,guests:6,img:'https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=500&q=80',badge:null,bt:'',amenities:['wifi','parking','kitchen','pet'],type:'farm'},
+  {id:12,title:'Rooftop Apartment with City View',loc:'Dubai, UAE',cat:'city',price:420,rating:4.88,reviews:203,beds:2,baths:2,guests:4,img:'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&q=80',badge:null,bt:'',amenities:['wifi','pool','ac','kitchen'],type:'apartment'},
+];
+
+// config maps
+const propertyTypeMap = [{id:'villa',label:'🏡 Villa'},{id:'apartment',label:'🏙️ Apartment'},{id:'cabin',label:'🌲 Cabin'},{id:'beachfront',label:'🏖️ Beachfront'},{id:'luxury',label:'💎 Luxury'},{id:'tiny',label:'🏕️ Tiny Home'},{id:'farm',label:'🌾 Farm'},{id:'mountain',label:'⛰️ Mountain'}];
+const amenitiesList = [
+  {id:'wifi',label:'📶 WiFi'},{id:'pool',label:'🏊 Pool'},{id:'parking',label:'🅿️ Free Parking'},{id:'ac',label:'❄️ Air Conditioning'},{id:'kitchen',label:'🍳 Kitchen'},{id:'pet',label:'🐾 Pet Friendly'},{id:'waterfront',label:'🌊 Waterfront'}
+];
+
+// state
+let currentCategory = 'all';
+let currentFilters = {
+  minPrice: 0,
+  maxPrice: 2000,
+  propertyTypes: new Set(['villa','apartment']), // default initial checked as example (matches UI)
+  bedrooms: 'any', // 'any','1','2','3','4+'
+  rating: '4+',    // 'any','3+','4+','5'
+  amenities: new Set(['wifi'])
+};
+let currentSort = 'rec';
+let filteredProperties = [...rawProps];
+
+function initFilterUI() {
+  // property types checkboxes
+  const propDiv = document.getElementById('propertyTypeFilters');
+  propDiv.innerHTML = propertyTypeMap.map(t => `<div class="chk"><input type="checkbox" id="prop_${t.id}" value="${t.id}" ${currentFilters.propertyTypes.has(t.id) ? 'checked' : ''}/><label for="prop_${t.id}">${t.label}</label><span>${rawProps.filter(p=>p.type===t.id).length}</span></div>`).join('');
+  // bedrooms pills
+  const bedDiv = document.getElementById('bedPills');
+  const bedOpts = ['any','1','2','3','4+'];
+  bedDiv.innerHTML = bedOpts.map(b => `<button class="pill-o ${currentFilters.bedrooms === b ? 'on' : ''}" data-bed="${b}">${b === 'any' ? 'Any' : b}</button>`).join('');
+  // rating pills
+  const ratingDiv = document.getElementById('starRow');
+  const ratingOpts = [{val:'any',label:'Any'},{val:'3+',label:'3★+'},{val:'4+',label:'4★+'},{val:'5',label:'5★'}];
+  ratingDiv.innerHTML = ratingOpts.map(r => `<button class="star-o ${currentFilters.rating === r.val ? 'on' : ''}" data-rating="${r.val}">${r.label}</button>`).join('');
+  // amenities checkboxes
+  const amenDiv = document.getElementById('amenitiesFilters');
+  amenDiv.innerHTML = amenitiesList.map(a => `<div class="chk"><input type="checkbox" id="am_${a.id}" value="${a.id}" ${currentFilters.amenities.has(a.id) ? 'checked' : ''}/><label for="am_${a.id}">${a.label}</label></div>`).join('');
+  // price inputs + slider sync
+  document.getElementById('minPriceFilter').value = currentFilters.minPrice;
+  document.getElementById('maxPriceFilter').value = currentFilters.maxPrice;
+  document.getElementById('priceRangeSlider').value = currentFilters.maxPrice;
+  attachEventListeners();
+}
+
+function attachEventListeners() {
+  // property type changes
+  document.querySelectorAll('#propertyTypeFilters input[type=checkbox]').forEach(cb => {
+    cb.onchange = () => { if(cb.checked) currentFilters.propertyTypes.add(cb.value); else currentFilters.propertyTypes.delete(cb.value); applyAllFilters(); };
+  });
+  // bedrooms
+  document.querySelectorAll('#bedPills .pill-o').forEach(btn => {
+    btn.onclick = () => { document.querySelectorAll('#bedPills .pill-o').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); currentFilters.bedrooms = btn.dataset.bed; applyAllFilters(); };
+  });
+  // rating
+  document.querySelectorAll('#starRow .star-o').forEach(btn => {
+    btn.onclick = () => { document.querySelectorAll('#starRow .star-o').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); currentFilters.rating = btn.dataset.rating; applyAllFilters(); };
+  });
+  // amenities
+  document.querySelectorAll('#amenitiesFilters input[type=checkbox]').forEach(cb => {
+    cb.onchange = () => { if(cb.checked) currentFilters.amenities.add(cb.value); else currentFilters.amenities.delete(cb.value); applyAllFilters(); };
+  });
+  // price range inputs
+  const minInp = document.getElementById('minPriceFilter');
+  const maxInp = document.getElementById('maxPriceFilter');
+  const slider = document.getElementById('priceRangeSlider');
+  minInp.oninput = () => { let v = parseInt(minInp.value)||0; currentFilters.minPrice = Math.min(v, currentFilters.maxPrice); minInp.value = currentFilters.minPrice; applyAllFilters(); };
+  maxInp.oninput = () => { let v = parseInt(maxInp.value)||2000; currentFilters.maxPrice = Math.min(Math.max(v, currentFilters.minPrice),2000); maxInp.value = currentFilters.maxPrice; slider.value = currentFilters.maxPrice; applyAllFilters(); };
+  slider.oninput = () => { currentFilters.maxPrice = parseInt(slider.value); maxInp.value = currentFilters.maxPrice; applyAllFilters(); };
+  // sort
+  document.getElementById('sortSelect').onchange = (e) => { currentSort = e.target.value; applyAllFilters(); };
+  // reset button
+  document.getElementById('resetFiltersBtn').onclick = () => {
+    currentFilters = { minPrice:0, maxPrice:2000, propertyTypes:new Set(['villa','apartment']), bedrooms:'any', rating:'4+', amenities:new Set(['wifi']) };
+    currentCategory = 'all';
+    document.querySelectorAll('.cat-item').forEach(i=>i.classList.remove('active'));
+    document.querySelector('.cat-item[data-cat="all"]').classList.add('active');
+    initFilterUI();
+    applyAllFilters();
+  };
+  document.getElementById('applyFiltersBtn').onclick = () => applyAllFilters();
+  document.getElementById('globalSearchBtn').onclick = () => { applyAllFilters(); };
+}
+
+function applyFiltersAndSort() {
+  let filtered = rawProps.filter(p => {
+    if (currentCategory !== 'all' && p.cat !== currentCategory) return false;
+    if (p.price < currentFilters.minPrice || p.price > currentFilters.maxPrice) return false;
+    if (!currentFilters.propertyTypes.has(p.type)) return false;
+    // bedroom filter
+    if (currentFilters.bedrooms !== 'any') {
+      let bedReq = parseInt(currentFilters.bedrooms);
+      if (currentFilters.bedrooms === '4+') { if (p.beds < 4) return false; }
+      else { if (p.beds !== bedReq) return false; }
+    }
+    // rating filter
+    if (currentFilters.rating === '3+') { if (p.rating < 3.0) return false; }
+    else if (currentFilters.rating === '4+') { if (p.rating < 4.0) return false; }
+    else if (currentFilters.rating === '5') { if (p.rating < 4.99) return false; }
+    // amenities all must be present
+    for (let amen of currentFilters.amenities) {
+      if (!p.amenities.includes(amen)) return false;
+    }
+    return true;
+  });
+  // sorting
+  if (currentSort === 'asc') filtered.sort((a,b)=>a.price-b.price);
+  else if (currentSort === 'desc') filtered.sort((a,b)=>b.price-a.price);
+  else if (currentSort === 'rat') filtered.sort((a,b)=>b.rating-a.rating);
+  else filtered.sort((a,b)=>b.reviews - a.reviews); // recommended
+  filteredProperties = filtered;
+  renderCardsWithPagination(filteredProperties);
+}
+
+let currentPage = 1;
+const ITEMS_PER_PAGE = 9;
+
+function renderCardsWithPagination(properties) {
+  const total = properties.length;
+  document.getElementById('resCount').innerText = total;
+  const start = (currentPage-1)*ITEMS_PER_PAGE;
+  const paginated = properties.slice(start, start+ITEMS_PER_PAGE);
+  const grid = document.getElementById('propGrid');
+  if(paginated.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-ico">🏡</div><strong>No stays match filters</strong><p style="margin-top:.5rem;">Try adjusting price, type or amenities</p></div>`;
+  } else {
+    grid.innerHTML = paginated.map((p,idx) => `<div class="prop-card" style="animation-delay:${(idx%9)*0.03}s" onclick="window.location='property-detail.html?id=${p.id}'"><div class="pc-img"><img src="${p.img}" alt="${p.title}" loading="lazy"/>${p.badge?`<div class="pc-badge ${p.bt}">${p.badge}</div>`:''}</div><div class="pc-body"><div class="pc-loc">📍 ${p.loc}</div><div class="pc-title">${p.title}</div><div class="pc-tags"><span class="pc-tag">🛏 ${p.beds} bed${p.beds>1?'s':''}</span><span class="pc-tag">🚿 ${p.baths} bath${p.baths>1?'s':''}</span><span class="pc-tag">👥 ${p.guests} guests</span></div><div class="pc-foot"><div class="pc-price">$${p.price}<span>/night</span></div><div class="pc-rat"><span class="pc-star">★</span>${p.rating}<span class="pc-rev">(${p.reviews})</span></div></div></div></div>`).join('');
+  }
+  renderPagination(total);
+}
+
+function renderPagination(total) {
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const container = document.getElementById('paginationContainer');
+  if(totalPages <= 1) { container.innerHTML = ''; return; }
+  let html = `<button class="pg wide" id="prevPageBtn">← Prev</button>`;
+  const maxVisible = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisible/2));
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  if(endPage - startPage + 1 < maxVisible) startPage = Math.max(1, endPage - maxVisible + 1);
+  for(let i=startPage; i<=endPage; i++) {
+    html += `<button class="pg ${currentPage===i ? 'on' : ''}" data-page="${i}">${i}</button>`;
+  }
+  html += `<button class="pg wide" id="nextPageBtn">Next →</button>`;
+  container.innerHTML = html;
+  document.querySelectorAll('[data-page]').forEach(btn => btn.addEventListener('click', (e) => { currentPage = parseInt(btn.dataset.page); renderCardsWithPagination(filteredProperties); window.scrollTo({top:0,behavior:'smooth'}); }));
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  if(prevBtn) prevBtn.onclick = () => { if(currentPage>1){ currentPage--; renderCardsWithPagination(filteredProperties); window.scrollTo({top:0}); } };
+  if(nextBtn) nextBtn.onclick = () => { if(currentPage<totalPages){ currentPage++; renderCardsWithPagination(filteredProperties); window.scrollTo({top:0}); } };
+}
+
+function applyAllFilters() {
+  currentPage = 1;
+  applyFiltersAndSort();
+}
+
+function onCategoryChange(cat) {
+  currentCategory = cat;
+  applyAllFilters();
+}
+
+// category event binding
+document.querySelectorAll('.cat-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.cat-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    onCategoryChange(item.dataset.cat);
+  });
+});
+
+function openMobSidebar(){ document.getElementById('sbDrawer').style.display='block'; document.getElementById('sbOverlay').style.display='block'; document.body.style.overflow='hidden'; }
+function closeMobSidebar(){ document.getElementById('sbDrawer').style.display='none'; document.getElementById('sbOverlay').style.display='none'; document.body.style.overflow=''; }
+
+// theme & scroll
+const root=document.documentElement; const saved=localStorage.getItem('sn-theme')||'light'; root.setAttribute('data-theme',saved); const tb=document.getElementById('themeBtn'); tb.textContent=saved==='dark'?'☀️':'🌙'; tb.addEventListener('click',()=>{ const n=root.getAttribute('data-theme')==='light'?'dark':'light'; root.setAttribute('data-theme',n); localStorage.setItem('sn-theme',n); tb.textContent=n==='dark'?'☀️':'🌙'; });
+window.addEventListener('scroll',()=>{ document.getElementById('toTop').classList.toggle('show',window.scrollY>400); });
+document.getElementById('logoBtn').addEventListener('click',()=>window.location.href='index.html');
+
+initFilterUI();
+applyAllFilters();
+</script>
+</body>
+</html>

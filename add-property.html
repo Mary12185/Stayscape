@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Property — StayScape</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f7f7f7;padding:40px 20px;}
+.container{max-width:850px;margin:auto;background:#fff;padding:40px;border-radius:28px;box-shadow:0 10px 40px rgba(0,0,0,.06);}
+h1{margin-bottom:30px;font-size:2rem;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.field{margin-bottom:20px;}
+.field label{display:block;margin-bottom:8px;font-size:.85rem;font-weight:700;}
+.field input,.field textarea,.field select{width:100%;padding:15px;border:1.5px solid #ddd;border-radius:14px;font-size:.92rem;}
+.field textarea{min-height:120px;resize:vertical;}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:#ff385c;}
+.full{grid-column:1/-1;}
+.btn{margin-top:10px;padding:16px 24px;background:#ff385c;color:#fff;border:none;border-radius:14px;font-size:.95rem;font-weight:700;cursor:pointer;}
+.btn:disabled{opacity:.6;cursor:not-allowed;}
+.back-link{display:inline-block;margin-bottom:24px;color:#666;text-decoration:none;font-size:.9rem;}
+.back-link:hover{color:#ff385c;}
+.error-msg{background:#ffe0e6;color:#c0392b;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:16px;display:none;grid-column:1/-1;}
+.success-msg{background:#e8f5e9;color:#2e7d32;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:16px;display:none;grid-column:1/-1;}
+@media(max-width:700px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="host-dashboard.html" class="back-link">&larr; Back to Dashboard</a>
+  <h1 id="pageTitle">Add New Property</h1>
+
+  <div class="grid">
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="success-msg" id="successMsg"></div>
+
+    <div class="field">
+      <label>Property Title</label>
+      <input type="text" id="title" placeholder="Luxury Beach Villa">
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input type="text" id="location" placeholder="Bali, Indonesia">
+    </div>
+    <div class="field">
+      <label>Price Per Night ($)</label>
+      <input type="number" id="price" placeholder="250" min="1">
+    </div>
+    <div class="field">
+      <label>Property Type</label>
+      <select id="type">
+        <option>Villa</option>
+        <option>Apartment</option>
+        <option>Cabin</option>
+        <option>House</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Max Guests</label>
+      <input type="number" id="guests" placeholder="4" min="1">
+    </div>
+    <div class="field">
+      <label>Bedrooms</label>
+      <input type="number" id="bedrooms" placeholder="2" min="1">
+    </div>
+    <div class="field full">
+      <label>Description</label>
+      <textarea id="description" placeholder="Describe your property..."></textarea>
+    </div>
+    <div class="field full">
+      <label>Image URL</label>
+      <input type="text" id="imageUrl" placeholder="https://... paste image URL here">
+    </div>
+  </div>
+
+  <button class="btn" id="publishBtn" onclick="publishProperty()">
+    Publish Property
+  </button>
+</div>
+
+<script>
+const API    = 'api.php';
+const params = new URLSearchParams(window.location.search);
+const editId = params.get('id');
+
+async function init() {
+  // Check host login
+  try {
+    const res  = await fetch(API + '?action=me');
+    const data = await res.json();
+    if (!data.loggedIn) {
+      window.location.href = 'host-login.html';
+    }
+  } catch(e) {
+    window.location.href = 'host-login.html';
+  }
+
+  // If editing, load existing data
+  if (editId) {
+    document.getElementById('pageTitle').textContent = 'Edit Property';
+    document.getElementById('publishBtn').textContent = 'Update Property';
+    try {
+      const res  = await fetch(API + '?action=get_property&id=' + editId);
+      const data = await res.json();
+      if (data.success) {
+        const p = data.property;
+        document.getElementById('title').value       = p.title;
+        document.getElementById('location').value    = p.location;
+        document.getElementById('price').value       = p.price_night;
+        document.getElementById('type').value        = p.property_type;
+        document.getElementById('guests').value      = p.guests;
+        document.getElementById('bedrooms').value    = p.bedrooms;
+        document.getElementById('description').value = p.description;
+        document.getElementById('imageUrl').value    = p.image_url;
+      }
+    } catch(e) {}
+  }
+}
+
+async function publishProperty() {
+  const title       = document.getElementById('title').value.trim();
+  const location    = document.getElementById('location').value.trim();
+  const price       = parseFloat(document.getElementById('price').value);
+  const type        = document.getElementById('type').value;
+  const guests      = parseInt(document.getElementById('guests').value);
+  const bedrooms    = parseInt(document.getElementById('bedrooms').value);
+  const description = document.getElementById('description').value.trim();
+  const imageUrl    = document.getElementById('imageUrl').value.trim();
+  const btn         = document.getElementById('publishBtn');
+
+  document.getElementById('errorMsg').style.display   = 'none';
+  document.getElementById('successMsg').style.display = 'none';
+
+  if (!title || !location || !price || price <= 0) {
+    showError('Title, location and valid price are required.');
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Publishing...';
+
+  try {
+    const action = editId ? 'update_property' : 'add_property';
+    const body   = { title, location, price_night: price, property_type: type, guests, bedrooms, description, image_url: imageUrl };
+    if (editId) body.id = parseInt(editId);
+
+    const res  = await fetch(API + '?action=' + action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById('successMsg').textContent  = 'Property published successfully! Redirecting to Dashboard...';
+      document.getElementById('successMsg').style.display = 'block';
+      setTimeout(() => window.location.href = 'host-dashboard.html', 1500);
+    } else {
+      showError(data.error || 'Property cannot be published.');
+      btn.disabled    = false;
+      btn.textContent = editId ? 'Update Property' : 'Publish Property';
+    }
+  } catch(e) {
+    showError('Server connection failed.');
+    btn.disabled    = false;
+    btn.textContent = editId ? 'Update Property' : 'Publish Property';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent   = msg;
+  el.style.display = 'block';
+}
+
+init();
+</script>
+</body>
+</html>
